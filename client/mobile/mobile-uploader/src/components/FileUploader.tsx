@@ -10,8 +10,9 @@ import {
   Platform
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import { uploadService, FileToUpload } from '../services/uploadService';
-import { getFileExtension } from '../utils/fileUtils';
+import { MaterialIcons } from '@expo/vector-icons';
+import {FileToUpload, uploadService} from "../services/uploadService";
+import {getFileExtension, normalizeFileName} from "../utils/fileUtils";
 
 // Tipo para el seguimiento del progreso de carga
 interface FileProgress {
@@ -32,7 +33,7 @@ const FileUploader: React.FC = () => {
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['image/*', 'video/*'],
+        type: ['image/*', 'video/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
         multiple: false,
       });
       
@@ -47,12 +48,15 @@ const FileUploader: React.FC = () => {
       // Crear un ID único para este archivo
       const fileId = Date.now().toString();
       
+      // Normalizar el nombre del archivo
+      const normalizedName = normalizeFileName(document.name || 'archivo-sin-nombre');
+      
       // Añadir el archivo a la lista con estado pendiente
       setFiles(currentFiles => [
         ...currentFiles,
         {
           id: fileId,
-          name: document.name || 'archivo-sin-nombre',
+          name: normalizedName,
           progress: 0,
           status: 'pending'
         }
@@ -61,7 +65,7 @@ const FileUploader: React.FC = () => {
       // Preparar archivo para cargar
       const fileToUpload: FileToUpload = {
         uri: document.uri,
-        name: document.name || 'archivo-sin-nombre',
+        name: normalizedName,
         type: document.mimeType || '',
         size: document.size
       };
@@ -91,30 +95,45 @@ const FileUploader: React.FC = () => {
         updateFileProgress(fileId, { progress });
       };
       
-      // Cargar archivo
-      const response = useChunks
-        ? await uploadService.uploadFileInChunks(file, 1024 * 1024, onProgress)
-        : await uploadService.uploadFile(file, onProgress);
+      // Cargar archivo con reintentos
+      let retries = 3;
+      let lastError = null;
       
-      if (response.success) {
-        // Carga exitosa
-        updateFileProgress(fileId, { 
-          status: 'completed', 
-          progress: 100,
-          url: response.fileUrl
-        });
-      } else {
-        // Error en la carga
-        updateFileProgress(fileId, { 
-          status: 'error', 
-          error: response.error || 'Error al cargar archivo'
-        });
+      while (retries > 0) {
+        try {
+          const response = useChunks
+            ? await uploadService.uploadFileInChunks(file, 1024 * 1024, onProgress)
+            : await uploadService.uploadFile(file, onProgress);
+          
+          if (response.success) {
+            updateFileProgress(fileId, { 
+              status: 'completed', 
+              progress: 100,
+              url: response.fileUrl
+            });
+            return;
+          } else {
+            throw new Error(response.error || 'Error al cargar archivo');
+          }
+        } catch (error: any) {
+          lastError = error;
+          if (error.response?.status === 429) {
+            // Esperar antes de reintentar
+            await new Promise(resolve => setTimeout(resolve, 2000 * (4 - retries)));
+            retries--;
+          } else {
+            throw error;
+          }
+        }
       }
-    } catch (error) {
+      
+      throw lastError;
+      
+    } catch (error: any) {
       console.error('Error al cargar archivo:', error);
       updateFileProgress(fileId, { 
         status: 'error', 
-        error: 'Error inesperado al cargar archivo'
+        error: error.message || 'Error inesperado al cargar archivo'
       });
     } finally {
       setIsUploading(false);
@@ -177,23 +196,29 @@ const FileUploader: React.FC = () => {
     }
     
     // Icono basado en tipo de archivo
-    let fileIcon = '📄'; // Documento por defecto
+    let iconName: keyof typeof MaterialIcons.glyphMap = 'insert-drive-file';
+    let iconColor = '#666';
     
     if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension)) {
-      fileIcon = '🖼️'; // Imagen
+      iconName = 'image';
+      iconColor = '#4CAF50';
     } else if (['mp4', 'mov', 'avi', 'webm'].includes(extension)) {
-      fileIcon = '🎬'; // Video
+      iconName = 'video-library';
+      iconColor = '#2196F3';
     } else if (['doc', 'docx'].includes(extension)) {
-      fileIcon = '📝'; // Documento Word
+      iconName = 'description';
+      iconColor = '#2196F3';
     } else if (['xls', 'xlsx'].includes(extension)) {
-      fileIcon = '📊'; // Excel
+      iconName = 'table-chart';
+      iconColor = '#4CAF50';
     } else if (['pdf'].includes(extension)) {
-      fileIcon = '📑'; // PDF
+      iconName = 'picture-as-pdf';
+      iconColor = '#F44336';
     }
     
     return (
       <View style={styles.fileIconContainer}>
-        <Text style={styles.fileIcon}>{fileIcon}</Text>
+        <MaterialIcons name={iconName} size={32} color={iconColor} />
       </View>
     );
   };
@@ -300,16 +325,21 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   fileIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 4,
+    width: 50,
+    height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    marginRight: 10,
-  },
-  fileIcon: {
-    fontSize: 24,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    marginRight: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   previewImage: {
     width: 40,

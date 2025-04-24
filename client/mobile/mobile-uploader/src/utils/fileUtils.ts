@@ -3,27 +3,24 @@
  */
 
 /**
- * Normaliza el nombre del archivo eliminando caracteres especiales y espacios
- * @param fileName Nombre del archivo original
- * @returns Nombre del archivo normalizado
+ * Normaliza un nombre de archivo eliminando caracteres especiales y espacios
+ * @param fileName Nombre del archivo a normalizar
+ * @returns Nombre normalizado
  */
 export const normalizeFileName = (fileName: string): string => {
-  // Obtener la extensión del archivo
-  const lastDotIndex = fileName.lastIndexOf('.');
-  const extension = lastDotIndex !== -1 ? fileName.slice(lastDotIndex) : '';
-  const baseName = lastDotIndex !== -1 ? fileName.slice(0, lastDotIndex) : fileName;
+  // Eliminar emojis y caracteres especiales
+  const withoutEmojis = fileName.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
   
-  // Normalizar el nombre base: reemplazar espacios por guiones y eliminar caracteres especiales
-  const normalizedBaseName = baseName
-    .normalize('NFD')                   // Descomponer acentos
-    .replace(/[\u0300-\u036f]/g, '')    // Eliminar diacríticos
-    .replace(/[^\w\-]/g, '-')          // Reemplazar caracteres no alfanuméricos por guiones
-    .replace(/\-+/g, '-')              // Convertir múltiples guiones en uno solo
-    .replace(/^\-+|\-+$/g, '')         // Eliminar guiones al inicio y final
-    .toLowerCase();                     // Convertir a minúsculas
+  // Reemplazar espacios y caracteres especiales por guiones
+  const normalized = withoutEmojis
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+    .replace(/[^a-zA-Z0-9.-]/g, '-') // Reemplazar caracteres no alfanuméricos por guiones
+    .replace(/-+/g, '-') // Reemplazar múltiples guiones por uno solo
+    .replace(/^-|-$/g, ''); // Eliminar guiones al inicio y final
   
-  // Devolver el nombre normalizado con la extensión original
-  return `${normalizedBaseName}${extension.toLowerCase()}`;
+  // Asegurar que el nombre no esté vacío
+  return normalized || 'archivo-sin-nombre';
 };
 
 /**
@@ -45,37 +42,36 @@ export const generateUniqueFileName = (fileName: string): string => {
 };
 
 /**
- * Extrae la extensión del nombre de archivo
+ * Obtiene la extensión de un archivo
  * @param fileName Nombre del archivo
- * @returns Extensión del archivo sin el punto
+ * @returns Extensión del archivo
  */
 export const getFileExtension = (fileName: string): string => {
-  const lastDotIndex = fileName.lastIndexOf('.');
-  return lastDotIndex !== -1 ? fileName.slice(lastDotIndex + 1).toLowerCase() : '';
+  const parts = fileName.split('.');
+  return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
 };
 
 /**
- * Determina el tipo MIME basado en la extensión del archivo
+ * Determina el tipo MIME de un archivo basado en su extensión
  * @param fileName Nombre del archivo
- * @returns Tipo MIME del archivo o application/octet-stream si no se reconoce
+ * @returns Tipo MIME correspondiente
  */
 export const getMimeType = (fileName: string): string => {
   const extension = getFileExtension(fileName);
   
-  const mimeTypes: Record<string, string> = {
+  const mimeTypes: { [key: string]: string } = {
     // Imágenes
     'jpg': 'image/jpeg',
     'jpeg': 'image/jpeg',
     'png': 'image/png',
     'gif': 'image/gif',
-    'webp': 'image/webp',
     'bmp': 'image/bmp',
+    'webp': 'image/webp',
     
     // Videos
     'mp4': 'video/mp4',
     'mov': 'video/quicktime',
     'avi': 'video/x-msvideo',
-    'wmv': 'video/x-ms-wmv',
     'webm': 'video/webm',
     
     // Documentos
@@ -84,16 +80,10 @@ export const getMimeType = (fileName: string): string => {
     'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'xls': 'application/vnd.ms-excel',
     'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'ppt': 'application/vnd.ms-powerpoint',
-    'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     
-    // Otros
-    'txt': 'text/plain',
-    'csv': 'text/csv',
-    'json': 'application/json',
-    'xml': 'application/xml',
-    'zip': 'application/zip',
+    // Por defecto
+    'default': 'application/octet-stream'
   };
   
-  return mimeTypes[extension] || 'application/octet-stream';
+  return mimeTypes[extension] || mimeTypes.default;
 }; 

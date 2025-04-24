@@ -58,3 +58,53 @@
 2025-04-24T13:12:49.142Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
 2025-04-24T13:12:49.149Z INFO: POST /chunk/dd50619c-6cef-41a9-a46b-ccf82fc275b5/0 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
 2025-04-24T13:12:49.155Z INFO: POST /finalize/dd50619c-6cef-41a9-a46b-ccf82fc275b5 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:42:24.838Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T14:12:24.828Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T14:29:02.501Z INFO: POST /init 200 - 7ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:29:02.559Z INFO: POST /chunk/75c15c81-8629-4bfa-94a1-2bf37f154f65/0 200 - 55ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:29:02.563Z INFO: POST /finalize/75c15c81-8629-4bfa-94a1-2bf37f154f65 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:29:28.119Z INFO: GET /complete/2025-04-24/Evolucio%CC%81n%20de%20Calcitonina%20en%20sangre%20%F0%9F%A7%AA-1745500357523.png 200 - 11ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:29:32.902Z INFO: GET / 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:29:58.321Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:29:58.329Z INFO: POST /chunk/0e13d297-5575-4cd7-a334-893000ba3001/0 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:29:58.334Z INFO: POST /finalize/0e13d297-5575-4cd7-a334-893000ba3001 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:30:05.877Z INFO: GET /complete/2025-04-24/Evolucio%CC%81n%20de%20Calcitonina%20en%20sangre%20%F0%9F%A7%AA-1745500357523.png 304 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.038Z INFO: POST /init 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.039Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.040Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.050Z INFO: POST /chunk/4c64a202-aa49-4aa6-83dc-177108dada1b/0 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.057Z INFO: POST /chunk/ec9b3ce6-43c2-488c-99e9-202d5be37ea6/0 200 - 6ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.057Z INFO: POST /chunk/9372a4dc-b33f-4559-980b-38549c7f93d6/0 200 - 5ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.063Z INFO: POST /finalize/4c64a202-aa49-4aa6-83dc-177108dada1b 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.064Z INFO: POST /finalize/ec9b3ce6-43c2-488c-99e9-202d5be37ea6 200 - 5ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.064Z INFO: POST /chunk/9372a4dc-b33f-4559-980b-38549c7f93d6/1 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.069Z INFO: POST /chunk/9372a4dc-b33f-4559-980b-38549c7f93d6/2 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:36:04.072Z INFO: POST /finalize/9372a4dc-b33f-4559-980b-38549c7f93d6 429 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:37:11.024Z INFO: POST /api/upload 404 - 6ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T14:38:12.052Z INFO: POST /init 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:12.066Z INFO: POST /chunk/8d14fd2b-665c-4d48-90ce-73f1d4983a03/0 200 - 8ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:12.076Z INFO: POST /chunk/8d14fd2b-665c-4d48-90ce-73f1d4983a03/1 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:12.079Z INFO: POST /finalize/8d14fd2b-665c-4d48-90ce-73f1d4983a03 400 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:13.085Z INFO: POST /init 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:13.092Z INFO: POST /chunk/bee086df-6b8e-4502-92e6-5c00f87ddd63/0 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:13.096Z INFO: POST /finalize/bee086df-6b8e-4502-92e6-5c00f87ddd63 400 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:14.043Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:14.050Z INFO: POST /finalize/a2ad0745-7222-4b7a-bc52-6ad5cd29e564 400 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:14.739Z INFO: POST /init 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:14.741Z INFO: POST /finalize/c9d853ab-2fa4-449b-9c7d-822cfc205a75 429 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:38:16.617Z INFO: POST /init 429 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T14:42:24.807Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T15:03:13.757Z INFO: POST /init 200 - 5ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T15:03:13.767Z INFO: POST /chunk/b6ea02fd-2a6f-4ed1-b3d6-1b623771bed5/0 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T15:03:13.771Z INFO: POST /finalize/b6ea02fd-2a6f-4ed1-b3d6-1b623771bed5 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T15:03:47.990Z INFO: POST /api/upload 404 - 3ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.125Z INFO: POST /init 200 - 2ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.170Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/0 200 - 10ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.207Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/1 200 - 3ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.244Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/2 200 - 5ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.281Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/3 200 - 5ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.319Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/4 200 - 5ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.358Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/5 200 - 5ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.395Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/6 200 - 5ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.439Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/7 200 - 10ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:04:24.476Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/8 429 - 0ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0

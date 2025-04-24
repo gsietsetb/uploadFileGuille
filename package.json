@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/node": "^22.14.1",
-    "axios": "^1.8.4"
+    "axios": "^1.8.4",
+    "expo-document-picker": "^13.0.3"
   }
 }
