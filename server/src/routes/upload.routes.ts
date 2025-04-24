@@ -11,15 +11,39 @@ const router = express.Router();
 
 // Configuración de Redis para el seguimiento del estado de carga
 let redisClient: Redis | null = null;
-try {
-  redisClient = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379', 10),
-    retryStrategy: (times: number) => Math.min(times * 50, 2000)
-  });
-  console.log('Redis conectado correctamente');
-} catch (err) {
-  console.error('Error al conectar Redis, usando almacenamiento en memoria:', err);
+
+// Verificar si Redis está habilitado
+const redisEnabled = process.env.REDIS_ENABLED === 'true';
+
+if (redisEnabled) {
+  try {
+    redisClient = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      retryStrategy: () => null, // Desactivar reintentos automáticos
+      enableOfflineQueue: false, // Desactivar la cola offline
+      maxRetriesPerRequest: 1
+    });
+    
+    // Manejar evento de error para evitar "Unhandled error event"
+    redisClient.on('error', (err) => {
+      if (redisClient) {
+        console.log('Redis no disponible, usando almacenamiento en memoria');
+        redisClient.disconnect();
+        redisClient = null;
+      }
+    });
+    
+    // Evento de conexión
+    redisClient.on('connect', () => {
+      console.log('Redis conectado correctamente');
+    });
+  } catch (err) {
+    console.error('Error al inicializar Redis, usando almacenamiento en memoria:', err);
+    redisClient = null;
+  }
+} else {
+  console.log('Redis desactivado en la configuración, usando almacenamiento en memoria');
 }
 
 // Interfaz para el estado de carga

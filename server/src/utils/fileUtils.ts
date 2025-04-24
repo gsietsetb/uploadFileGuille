@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { promisify } from 'util';
-import * as FileType from 'file-type';
+import fileType from 'file-type';
 
 const fsExists = promisify(fs.exists);
 const fsMkdir = promisify(fs.mkdir);
@@ -78,7 +78,7 @@ export const validateFileType = async (
   declaredType: string
 ): Promise<boolean> => {
   try {
-    const fileTypeResult = await FileType.fileTypeFromBuffer(buffer);
+    const fileTypeResult = await fileType.fromBuffer(buffer);
     
     // Si no se pudo detectar, podría ser un archivo de texto
     if (!fileTypeResult) {

@@ -75,7 +75,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/monitoring', monitoringRoutes);
 
 // Servir archivos estáticos de la carpeta uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads/complete')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Ruta raíz
 app.get('/', (req: Request, res: Response) => {

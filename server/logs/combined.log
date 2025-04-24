@@ -1,0 +1,60 @@
+2025-04-24T11:57:22.275Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T11:57:22.279Z INFO: Carpetas configuradas correctamente
+2025-04-24T11:59:50.932Z INFO: GET /ws 404 - 2ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T11:59:53.930Z INFO: GET /ws 404 - 1ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T11:59:58.933Z INFO: GET /ws 404 - 2ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:00:07.686Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T12:00:07.690Z INFO: Carpetas configuradas correctamente
+2025-04-24T12:00:07.930Z INFO: GET /ws 404 - 2ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:00:24.934Z INFO: GET /ws 404 - 3ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:00:56.140Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T12:00:56.144Z INFO: Carpetas configuradas correctamente
+2025-04-24T12:00:57.938Z INFO: GET /ws 404 - 3ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:01:24.408Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T12:01:24.410Z INFO: Carpetas configuradas correctamente
+2025-04-24T12:01:55.468Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T12:01:55.470Z INFO: Carpetas configuradas correctamente
+2025-04-24T12:02:02.933Z INFO: GET /ws 404 - 3ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.341Z INFO: POST /init 200 - 5ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.353Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/0 200 - 8ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.359Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/1 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.365Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/2 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.371Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/3 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.375Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/4 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.381Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/5 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.385Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/6 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.389Z INFO: POST /chunk/99d7900a-cb4a-47e2-a5e8-6db117599035/7 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:03.412Z INFO: POST /finalize/99d7900a-cb4a-47e2-a5e8-6db117599035 200 - 21ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:02:10.562Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T12:02:10.564Z INFO: Carpetas configuradas correctamente
+2025-04-24T12:04:35.003Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T12:04:35.006Z INFO: Carpetas configuradas correctamente
+2025-04-24T12:08:28.952Z INFO: GET /ws 404 - 5ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:22:12.972Z INFO: POST /init 200 - 8ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:22:12.981Z INFO: POST /chunk/34369f6b-b64f-447c-a7ff-0fa85561e215/0 200 - 7ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:22:12.987Z INFO: POST /chunk/34369f6b-b64f-447c-a7ff-0fa85561e215/1 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:22:12.992Z INFO: POST /chunk/34369f6b-b64f-447c-a7ff-0fa85561e215/2 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:22:13.002Z INFO: POST /finalize/34369f6b-b64f-447c-a7ff-0fa85561e215 200 - 7ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:22:31.722Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T12:22:31.725Z INFO: Carpetas configuradas correctamente
+2025-04-24T12:23:39.196Z INFO: GET /ws 404 - 4ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T12:52:31.738Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T13:07:48.701Z INFO: POST /init 200 - 13ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:07:48.710Z INFO: POST /chunk/a0d79285-251e-4a92-9d81-f32af405d8e2/0 200 - 6ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:07:48.717Z INFO: POST /finalize/a0d79285-251e-4a92-9d81-f32af405d8e2 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:07:59.631Z INFO: POST /init 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:07:59.639Z INFO: POST /chunk/0bbe173a-c43e-42e3-9c4a-cd9e2c6ee8ba/0 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:07:59.644Z INFO: POST /finalize/0bbe173a-c43e-42e3-9c4a-cd9e2c6ee8ba 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:09:42.155Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T13:09:42.156Z INFO: Carpetas configuradas correctamente
+2025-04-24T13:12:24.842Z INFO: Servidor corriendo en el puerto 3001
+2025-04-24T13:12:24.844Z INFO: Carpetas configuradas correctamente
+2025-04-24T13:12:37.511Z INFO: POST /init 200 - 6ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:37.512Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:37.520Z INFO: POST /chunk/57caba56-903c-4376-90c4-0273463378c7/0 200 - 6ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:37.522Z INFO: POST /chunk/15c70ad7-b969-4504-917d-f47b3e33dba7/0 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:37.526Z INFO: POST /finalize/57caba56-903c-4376-90c4-0273463378c7 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:37.527Z INFO: POST /finalize/15c70ad7-b969-4504-917d-f47b3e33dba7 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:49.142Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:49.149Z INFO: POST /chunk/dd50619c-6cef-41a9-a46b-ccf82fc275b5/0 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T13:12:49.155Z INFO: POST /finalize/dd50619c-6cef-41a9-a46b-ccf82fc275b5 200 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
