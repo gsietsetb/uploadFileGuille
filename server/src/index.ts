@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
-import { setupFolders } from './utils/fileUtils';
+import { setupFolders, cleanupOldChunks, cleanupOldFiles } from './utils/fileUtils';
 import uploadRoutes from './routes/upload.routes';
 import monitoringRoutes from './routes/monitoring.routes';
 import { logger } from './utils/logger';
@@ -84,17 +84,15 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info(`Servidor corriendo en el puerto ${PORT}`);
 });
 
 // Tarea programada para limpiar chunks antiguos (cada 30 minutos)
-setInterval(() => {
-  import('./utils/fileUtils').then(({ cleanupOldChunks }) => {
-    cleanupOldChunks()
-      .then(() => logger.info('Limpieza de chunks antiguos completada'))
-      .catch(err => logger.error('Error al limpiar chunks antiguos:', err));
-  });
+const cleanupChunksInterval = setInterval(() => {
+  cleanupOldChunks()
+    .then(() => logger.info('Limpieza de chunks antiguos completada'))
+    .catch(err => logger.error('Error al limpiar chunks antiguos:', err));
 }, 30 * 60 * 1000);
 
 // Tarea programada para limpiar archivos antiguos (a medianoche)
@@ -109,14 +107,12 @@ const scheduleMidnightCleanup = () => {
   const msToMidnight = night.getTime() - now.getTime();
   
   setTimeout(() => {
-    import('./utils/fileUtils').then(({ cleanupOldFiles }) => {
-      cleanupOldFiles()
-        .then(() => logger.info('Limpieza de archivos antiguos completada'))
-        .catch(err => logger.error('Error al limpiar archivos antiguos:', err));
-      
-      // Programar para la siguiente medianoche
-      scheduleMidnightCleanup();
-    });
+    cleanupOldFiles()
+      .then(() => logger.info('Limpieza de archivos antiguos completada'))
+      .catch(err => logger.error('Error al limpiar archivos antiguos:', err));
+    
+    // Programar para la siguiente medianoche
+    scheduleMidnightCleanup();
   }, msToMidnight);
 };
 
@@ -125,5 +121,10 @@ scheduleMidnightCleanup();
 // Manejo de cierre graceful
 process.on('SIGTERM', () => {
   logger.info('SIGTERM recibido. Cerrando servidor...');
-  process.exit(0);
-}); 
+  server.close(() => {
+    clearInterval(cleanupChunksInterval);
+    process.exit(0);
+  });
+});
+
+export default app; 
