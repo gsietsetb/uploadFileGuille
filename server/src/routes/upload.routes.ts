@@ -1,11 +1,14 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction, Router } from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs/promises';
 import crypto from 'crypto';
-import { saveChunk, assembleFile, getChunkPath, validateFileType } from '../utils/fileUtils';
+import { saveChunk, assembleFile, getChunkPath, validateFileType, calculateFileHash, cleanupOldChunks } from '../utils/fileUtils';
 import Redis from 'ioredis';
 import winston from 'winston';
+import { createClient, RedisClientType } from 'redis';
+import { RateLimiterMemory, RateLimiterRedis } from 'rate-limiter-flexible';
+import { logger } from './../utils/logger';
 
 const router = express.Router();
 
@@ -49,13 +52,17 @@ if (redisEnabled) {
 // Interfaz para el estado de carga
 interface UploadStatus {
   totalChunks: number;
-  receivedChunks: number[];
+  receivedChunks: Set<number>;
   fileName: string;
   fileType: string;
+  validatedFileType?: string;
+  uploadStartTime: number;
   isPaused: boolean;
   isCompleted: boolean;
-  userId?: string;
-  startTime: number;
+  filePath?: string;
+  md5Hash?: string;
+  error?: string;
+  lastActivityTime: number;
 }
 
 // Almacenamiento en memoria alternativo cuando Redis no está disponible
@@ -91,7 +98,7 @@ interface ChunkRequest extends Request {
 
 // Función para manejar errores de forma centralizada
 const handleError = (res: Response, error: any, message: string) => {
-  uploadLogger.error(`${message}: ${error.message}`, { error });
+  logger.error(`${message}: ${error.message}`, { error });
   return res.status(500).json({
     error: message,
     details: error.message
@@ -104,51 +111,71 @@ interface UploadStatusData {
   receivedChunks?: number[];
   fileName?: string;
   fileType?: string;
+  validatedFileType?: string;
   isPaused?: boolean;
   isCompleted?: boolean;
   userId?: string;
   startTime?: number;
+  finalPath?: string;
+  md5Hash?: string;
 }
 
 // Función para guardar/actualizar estado de carga
 const saveUploadStatus = async (
-  fileId: string, 
-  data: UploadStatusData
+  fileId: string,
+  data: Partial<UploadStatus>
 ) => {
   try {
+    let statusToSave: any;
+    
     if (redisClient) {
-      // Primero obtener estado actual si existe
-      const currentStatus = await redisClient.get(`upload:${fileId}`);
-      let status = data;
+      const currentStatusString = await redisClient.get(`upload:${fileId}`);
+      const currentStatus = currentStatusString ? JSON.parse(currentStatusString) : {};
       
-      if (currentStatus) {
-        status = { ...JSON.parse(currentStatus), ...data };
-      } else if (!data.startTime) {
-        status = { ...data, startTime: Date.now() };
-      }
-      
-      // Guardar en Redis (expira en 24 horas)
-      await redisClient.set(`upload:${fileId}`, JSON.stringify(status), 'EX', 60 * 60 * 24);
-    } else {
-      // Almacenamiento en memoria
-      if (memoryUploadStatus.has(fileId)) {
-        const current = memoryUploadStatus.get(fileId)!;
-        memoryUploadStatus.set(fileId, { ...current, ...data } as UploadStatus);
+      // Merge data, converting Set to Array for storage
+      statusToSave = { ...currentStatus, ...data };
+      // Ensure receivedChunks is always an array in the object to be saved
+      if (data.receivedChunks instanceof Set) {
+          statusToSave.receivedChunks = Array.from(data.receivedChunks);
+      } else if (data.receivedChunks && Array.isArray(data.receivedChunks)) {
+          statusToSave.receivedChunks = data.receivedChunks;
+      } else if (currentStatus.receivedChunks && !data.receivedChunks) {
+          statusToSave.receivedChunks = currentStatus.receivedChunks; // Keep existing array if not updated
       } else {
-        memoryUploadStatus.set(fileId, { 
-          totalChunks: data.totalChunks || 0, 
-          receivedChunks: data.receivedChunks || [], 
-          fileName: data.fileName || '', 
-          fileType: data.fileType || '',
-          isPaused: data.isPaused || false,
-          isCompleted: data.isCompleted || false,
-          userId: data.userId,
-          startTime: data.startTime || Date.now()
-        });
+           statusToSave.receivedChunks = []; // Default to empty array
       }
+
+      if (!statusToSave.uploadStartTime) {
+        statusToSave.uploadStartTime = Date.now();
+      }
+      
+      await redisClient.set(`upload:${fileId}`, JSON.stringify(statusToSave), 'EX', 60 * 60 * 24);
+    } else {
+      const current = memoryUploadStatus.get(fileId);
+      const newStatus = { ...current, ...data } as UploadStatus; // Cast to UploadStatus
+
+      // Ensure receivedChunks is a Set in memory
+      if (Array.isArray(newStatus.receivedChunks)) {
+          newStatus.receivedChunks = new Set(newStatus.receivedChunks);
+      } else if (!newStatus.receivedChunks) {
+          newStatus.receivedChunks = new Set<number>();
+      } else if (!(newStatus.receivedChunks instanceof Set)) {
+          // En caso de que receivedChunks exista pero no sea un Set ni un Array
+          newStatus.receivedChunks = new Set<number>();
+      }
+      
+      if (!newStatus.uploadStartTime) {
+        newStatus.uploadStartTime = Date.now();
+      }
+      
+      memoryUploadStatus.set(fileId, newStatus);
+      statusToSave = newStatus; // For logging if needed
     }
+     logger.debug(`Status saved for ${fileId}`, { status: statusToSave });
+     return statusToSave; // Devolvemos el estado guardado para seguimiento
   } catch (error) {
-    console.error('Error al guardar estado de carga:', error);
+    logger.error('Error al guardar estado de carga:', { error, fileId });
+    throw error; // Re-lanzamos el error para manejo superior
   }
 };
 
@@ -156,15 +183,52 @@ const saveUploadStatus = async (
 const getUploadStatus = async (fileId: string): Promise<UploadStatus | null> => {
   try {
     if (redisClient) {
-      const status = await redisClient.get(`upload:${fileId}`);
-      return status ? JSON.parse(status) : null;
+      const statusString = await redisClient.get(`upload:${fileId}`);
+      if (!statusString) return null;
+      const status = JSON.parse(statusString);
+      // Convert receivedChunks array back to Set
+      status.receivedChunks = new Set(status.receivedChunks || []);
+      return status as UploadStatus;
     } else {
-      return memoryUploadStatus.get(fileId) || null;
+       const status = memoryUploadStatus.get(fileId);
+       if (!status) return null;
+       // Ensure receivedChunks is a Set (should be already, but good practice)
+       if (!(status.receivedChunks instanceof Set)) {
+         status.receivedChunks = new Set(Array.isArray(status.receivedChunks) ? status.receivedChunks : []);
+       }
+       return status;
     }
   } catch (error) {
-    console.error('Error al obtener estado de carga:', error);
+    logger.error('Error al obtener estado de carga:', { error, fileId });
     return null;
   }
+};
+
+// Configuración de tipos permitidos (ejemplo, leer desde env vars sería mejor)
+// Formato: lista de MIME types completos o prefijos (ej. 'image/')
+const ALLOWED_MIME_TYPES = (process.env.ALLOWED_MIME_TYPES || 'image/jpeg,image/png,image/gif,video/mp4,application/pdf').split(',');
+const TEMP_DIR = path.join(__dirname, '../../uploads/.temp'); // Define TEMP_DIR correctly once, using .temp subfolder
+
+// Middleware para validar File ID
+const validateFileId = async (req: Request, res: Response, next: NextFunction) => {
+    const fileId = req.params.fileId;
+    if (!fileId || !/^[a-zA-Z0-9-]+$/.test(fileId)) {
+        logger.warn(`Invalid fileId format received: ${fileId}`);
+        return res.status(400).json({ message: 'Invalid file ID format.' });
+    }
+    try {
+        const status = await getUploadStatus(fileId);
+        if (!status) {
+            logger.warn(`File ID ${fileId} not found for validation.`);
+            return res.status(404).json({ message: 'Upload session not found.' });
+        }
+        // Adjuntar el estado al request para reusarlo en la ruta
+        (req as any).uploadStatus = status;
+        next();
+    } catch (error) {
+        logger.error(`Error validating fileId ${fileId}: ${error}`);
+        res.status(500).json({ message: 'Error validating upload session.' });
+    }
 };
 
 /**
@@ -181,42 +245,38 @@ router.post('/init', async (req: Request, res: Response) => {
       });
     }
     
-    // Validar tipo de archivo
-    const allowedTypes = ['image/', 'video/'];
-    if (!allowedTypes.some(type => fileType.startsWith(type))) {
-      return res.status(400).json({
-        error: 'Tipo de archivo no permitido. Solo se aceptan imágenes y videos.'
-      });
-    }
+    // Nota: La validación robusta del tipo se hará en el primer chunk.
+    // Aquí podríamos hacer una validación básica si se desea.
+    // const allowedTypes = ['image/', 'video/', 'application/pdf']; // Ejemplo
+    // if (!allowedTypes.some(type => fileType.startsWith(type))) {
+    //   uploadLogger.warn(`Tipo de archivo reportado no permitido inicialmente: ${fileType}`, { fileName });
+    //   // No rechazamos aún, esperamos a la validación del chunk 0
+    // }
     
     // Generar ID único para el archivo
-    const fileId = crypto.randomUUID();
+    const fileId = crypto.randomBytes(16).toString('hex');
     
     // Guardar metadatos iniciales
-    await saveUploadStatus(fileId, {
-      totalChunks: parseInt(totalChunks, 10),
-      receivedChunks: [],
+    const initialStatus: UploadStatus = {
+      totalChunks,
+      receivedChunks: new Set<number>(),
       fileName,
-      fileType,
+      fileType, // Tipo reportado por el cliente
       isPaused: false,
       isCompleted: false,
-      userId
-    });
-    
-    uploadLogger.info(`Carga inicializada: ${fileName}`, { 
-      fileId, 
-      fileName, 
-      fileSize, 
-      fileType, 
-      totalChunks,
-      ip: req.ip,
-      userAgent: req.headers['user-agent']
-    });
-    
-    res.status(200).json({
-      fileId,
-      message: 'Carga inicializada correctamente'
-    });
+      uploadStartTime: Date.now(),
+      lastActivityTime: Date.now()
+    };
+
+    try {
+      // Eliminar la conversión explícita de Set a Array, dejar initialStatus sin modificar
+      await saveUploadStatus(fileId, initialStatus); // Pasar el objeto con receivedChunks como Set<number>
+      logger.info(`Upload initialized for ${fileName} with fileId ${fileId}`);
+      res.status(201).json({ fileId, message: 'Upload initialized successfully.' });
+    } catch (error) {
+      logger.error(`Error initializing upload for ${fileName}: ${error}`);
+      res.status(500).json({ message: 'Failed to initialize upload session.' });
+    }
   } catch (error) {
     handleError(res, error, 'Error al inicializar la carga');
   }
@@ -226,138 +286,177 @@ router.post('/init', async (req: Request, res: Response) => {
  * Subir un chunk
  * POST /api/upload/chunk/:fileId/:chunkIndex
  */
-router.post('/chunk/:fileId/:chunkIndex', upload.single('chunk'), async (req: ChunkRequest, res: Response) => {
+router.post('/chunk/:fileId/:chunkIndex', validateFileId, upload.single('chunk'), async (req: Request, res: Response) => {
+  const { fileId, chunkIndex: chunkIndexStr } = req.params;
+  const chunkIndex = parseInt(chunkIndexStr, 10);
+  const logger = req.app.get('logger') as winston.Logger;
+  const status = (req as any).uploadStatus as UploadStatus;
+
+  if (!req.file) {
+    logger.warn('Intento de subir chunk sin archivo', { fileId, chunkIndex });
+    return res.status(400).json({ message: 'Chunk no proporcionado' });
+  }
+
+  if (isNaN(chunkIndex) || chunkIndex < 0 || chunkIndex >= status.totalChunks) {
+    logger.warn('Índice de chunk inválido', { fileId, chunkIndex: chunkIndexStr });
+    return res.status(400).json({ message: 'Índice de chunk inválido' });
+  }
+
   try {
-    const { fileId, chunkIndex } = req.params;
-    const chunkIndexNum = parseInt(chunkIndex, 10);
-    
-    if (!req.file || !req.file.buffer) {
-      return res.status(400).json({
-        error: 'No se recibió ningún chunk'
-      });
-    }
-    
-    // Verificar estado actual de la carga
-    const status = await getUploadStatus(fileId);
-    
-    if (!status) {
-      return res.status(404).json({
-        error: 'ID de carga no encontrado. Inicialice la carga primero.'
-      });
-    }
-    
     if (status.isCompleted) {
-      return res.status(400).json({
-        error: 'La carga ya ha sido completada'
-      });
+      logger.info('Chunk recibido para un archivo ya completado', { fileId });
+      return res.status(200).json({ message: 'Archivo ya completado' });
     }
-    
+
     if (status.isPaused) {
-      return res.status(409).json({
-        error: 'La carga está en pausa'
-      });
+      logger.info('Chunk recibido para un archivo pausado', { fileId });
+      return res.status(409).json({ message: 'La carga está pausada' }); // 409 Conflict
+    }
+
+    // Validar tipo de archivo en el primer chunk
+    if (chunkIndex === 0 && !status.validatedFileType) {
+      // Validation now happens within assembleFile using the first chunk buffer there.
+      // We store the declared type and rely on assembleFile's validation.
+      // const isValid = await validateFileType(req.file.buffer, status.fileType); // Remove direct validation here
+      // if (!isValid) { ... } 
+      // status.validatedFileType = status.fileType; // Validation occurs during final assembly
+       logger.info('First chunk received, type validation deferred to finalize step.', { fileId, declaredType: status.fileType });
     }
     
-    // Si es el primer chunk, validar el tipo de archivo
-    if (chunkIndexNum === 0) {
-      const isValidType = await validateFileType(req.file.buffer, status.fileType);
-      if (!isValidType) {
-        return res.status(400).json({
-          error: 'El tipo de archivo real no coincide con el tipo declarado'
-        });
-      }
+    // Verificar si el chunk ya fue recibido (importante para reintentos)
+    if (status.receivedChunks.has(chunkIndex)) {
+      logger.info('Chunk duplicado recibido', { fileId, chunkIndex });
+      return res.status(200).json({ message: 'Chunk ya recibido' });
     }
-    
-    // Guardar el chunk en el sistema de archivos
-    const chunkPath = await saveChunk(fileId, chunkIndexNum, req.file.buffer);
-    
-    // Actualizar estado de carga con el nuevo chunk
-    const receivedChunks = [...(status.receivedChunks || [])];
-    if (!receivedChunks.includes(chunkIndexNum)) {
-      receivedChunks.push(chunkIndexNum);
-    }
-    
-    await saveUploadStatus(fileId, { receivedChunks });
-    
-    uploadLogger.debug(`Chunk recibido: ${fileId}-${chunkIndexNum}`, { 
-      fileId, 
-      chunkIndex: chunkIndexNum, 
-      progress: `${receivedChunks.length}/${status.totalChunks}`
+
+    // Guardar el chunk
+    await saveChunk(fileId, chunkIndex, req.file.buffer);
+    logger.debug('Chunk guardado', { fileId, chunkIndex });
+
+    // Actualizar estado
+    status.receivedChunks.add(chunkIndex);
+    status.lastActivityTime = Date.now();
+    await saveUploadStatus(fileId, { 
+      receivedChunks: status.receivedChunks,
+      lastActivityTime: status.lastActivityTime 
     });
-    
-    res.status(200).json({
-      message: 'Chunk recibido correctamente',
-      fileId,
-      chunkIndex: chunkIndexNum,
-      receivedChunks,
-      totalChunks: status.totalChunks
-    });
+
+    res.status(200).json({ message: `Chunk ${chunkIndex} recibido` });
+
   } catch (error) {
-    handleError(res, error, 'Error al procesar el chunk');
+    logger.error('Error al procesar chunk', { fileId, chunkIndex, error: (error as Error).message, stack: (error as Error).stack });
+    res.status(500).json({ message: 'Error interno al procesar el chunk' });
   }
 });
+
+// Función auxiliar para eliminar estado (y chunks)
+const deleteUploadStatusAndChunks = async (fileId: string, status: UploadStatus | null) => {
+   // Use the retrieved status if available, otherwise fetch it
+   const currentStatus = status || await getUploadStatus(fileId);
+   const totalChunks = currentStatus?.totalChunks || 0; // Default to 0 if status not found
+
+  try {
+    if (redisClient) {
+      await redisClient.del(`upload:${fileId}`);
+    } else {
+      memoryUploadStatus.delete(fileId);
+    }
+    logger.info(`Estado de carga eliminado para fileId: ${fileId}`);
+
+    // Eliminar chunks asociados usando la función importada
+    await cleanupOldChunks(); // Call without arguments
+
+  } catch (error) {
+    logger.error('Error al eliminar estado de carga o chunks', { fileId, error: (error as Error).message });
+  }
+};
 
 /**
  * Finalizar la carga y ensamblar el archivo
  * POST /api/upload/finalize/:fileId
  */
-router.post('/finalize/:fileId', async (req: Request, res: Response) => {
+router.post('/finalize/:fileId', validateFileId, async (req: Request, res: Response) => {
+  const { fileId } = req.params;
+  const logger = req.app.get('logger') as winston.Logger;
+  const status = (req as any).uploadStatus as UploadStatus;
+  const { md5: clientMd5 } = req.body; // Opcional: MD5 enviado por el cliente para verificación
+
+  if (status.isCompleted) {
+    logger.warn(`Finalize called for already completed fileId ${fileId}.`);
+    // Devolver la URL existente si ya está completado y el archivo existe
+    if (status.filePath) { // Use filePath
+      try {
+        await fs.access(status.filePath); // Use filePath
+        const fileUrl = `${req.protocol}://${req.get('host')}/uploads/complete/${path.basename(status.filePath)}`; // Adjust URL based on assembleFile structure
+        return res.status(200).json({ message: 'Upload already completed.', fileUrl, md5Hash: status.md5Hash });
+      } catch (accessError) {
+        logger.warn(`Final file path ${status.filePath} for completed upload ${fileId} not accessible. Re-assembling.`); // Use filePath
+        // Si el archivo no existe, permitir re-ensamblaje (proceder)
+      }
+    } else {
+      // Si está completado pero sin ruta final (estado inconsistente?), intentar ensamblar.
+      logger.warn(`Finalize called for completed fileId ${fileId} but finalPath is missing. Attempting assembly.`);
+    }
+  }
+
+  if (status.receivedChunks.size !== status.totalChunks) {
+    logger.warn(`Finalize called for fileId ${fileId} before all chunks received. Received: ${status.receivedChunks.size}/${status.totalChunks}`);
+    return res.status(400).json({
+      message: 'Not all chunks have been uploaded.',
+      receivedChunks: Array.from(status.receivedChunks).sort((a, b) => a - b), // Enviar chunks recibidos para depuración
+      totalChunks: status.totalChunks
+    });
+  }
+
+  const finalFileName = status.fileName; // Usar el nombre original almacenado
+  // finalPath is determined within assembleFile now
+  // const finalPath = path.join(TEMP_DIR, finalFileName); // Removed finalPath definition here
+
   try {
-    const { fileId } = req.params;
-    
-    // Verificar estado actual de la carga
-    const status = await getUploadStatus(fileId);
-    
-    if (!status) {
-      return res.status(404).json({
-        error: 'ID de carga no encontrado'
-      });
+    // Asegurarse que la función assembleFile usa el fileId, totalChunks, fileName, fileType correctos
+    const assemblyResult = await assembleFile(fileId, status.totalChunks, finalFileName, status.fileType); // Pass required arguments
+    logger.info(`File ${finalFileName} (fileId: ${fileId}) assembled successfully at ${assemblyResult.path}`);
+
+    // Calcular MD5 hash del archivo ensamblado (hash is returned by assembleFile)
+    const serverMd5 = assemblyResult.hash; // Use hash from result
+    logger.info(`MD5 hash calculated for ${finalFileName} (fileId: ${fileId}): ${serverMd5}`);
+
+    // Verificar MD5 si el cliente lo envió
+    if (clientMd5 && clientMd5 !== serverMd5) {
+      logger.warn(`MD5 mismatch for fileId ${fileId}. Client: ${clientMd5}, Server: ${serverMd5}`);
+      // Considerar eliminar el archivo ensamblado si hay mismatch? O devolver error?
+      await fs.unlink(assemblyResult.path).catch(err => logger.error(`Failed to delete mismatched file ${assemblyResult.path}: ${err}`)); // Limpiar archivo incorrecto
+      await deleteUploadStatusAndChunks(fileId, status); // Limpiar estado y chunks
+      return res.status(400).json({ message: 'File integrity check failed (MD5 mismatch).' });
     }
-    
-    if (status.isCompleted) {
-      return res.status(400).json({
-        error: 'La carga ya ha sido completada'
-      });
-    }
-    
-    const { totalChunks, receivedChunks, fileName, fileType } = status;
-    
-    // Verificar que todos los chunks existan
-    if (receivedChunks.length !== totalChunks) {
-      return res.status(400).json({
-        error: `Carga incompleta: ${receivedChunks.length}/${totalChunks} chunks recibidos`,
-        receivedChunks,
-        missingChunks: Array.from(Array(totalChunks).keys())
-          .filter(i => !receivedChunks.includes(i))
-      });
-    }
-    
-    // Ensamblar el archivo final
-    const fileResult = await assembleFile(fileId, totalChunks, fileName, fileType);
-    
-    // Marcar como completado
-    await saveUploadStatus(fileId, { isCompleted: true });
-    
-    const timeElapsed = Math.round((Date.now() - status.startTime) / 1000);
-    
-    uploadLogger.info(`Archivo ensamblado: ${fileName}`, { 
-      fileId, 
-      fileName, 
-      fileType, 
-      fileHash: fileResult.hash,
-      timeElapsed,
-      isDuplicate: fileResult.isDuplicate
+
+    // Actualizar estado a completado
+    status.isCompleted = true;
+    status.filePath = assemblyResult.path; // Use filePath and path from result
+    status.md5Hash = serverMd5;
+    status.lastActivityTime = Date.now();
+
+    // Pass a partial update, ensuring receivedChunks is handled by saveUploadStatus logic
+    await saveUploadStatus(fileId, { 
+        isCompleted: true,
+        filePath: assemblyResult.path,
+        md5Hash: serverMd5,
+        lastActivityTime: status.lastActivityTime
+        // Let saveUploadStatus handle merging/preserving receivedChunks
     });
-    
-    res.status(200).json({
-      message: 'Archivo ensamblado correctamente',
-      fileName,
-      fileUrl: fileResult.url,
-      fileHash: fileResult.hash,
-      isDuplicate: fileResult.isDuplicate
-    });
+
+    // Limpiar chunks temporales después de ensamblar (Handled by assembleFile internally now)
+    // await cleanupOldChunks(fileId, status.totalChunks); // Removed duplicate cleanup call
+
+    const fileUrl = assemblyResult.url; // Use URL from result
+    logger.info(`Upload finalized successfully for fileId ${fileId}. URL: ${fileUrl}`);
+    res.status(200).json({ message: 'File uploaded and assembled successfully.', fileUrl, md5Hash: serverMd5 });
+
   } catch (error) {
-    handleError(res, error, 'Error al ensamblar el archivo');
+    logger.error(`Error finalizing upload for fileId ${fileId}: ${error}`);
+    // Intentar limpiar estado incluso si falla el ensamblaje
+    await deleteUploadStatusAndChunks(fileId, status).catch(delErr => logger.error(`Failed to cleanup status/chunks for failed finalization ${fileId}: ${delErr}`));
+    res.status(500).json({ message: 'Failed to assemble file.' });
   }
 });
 
@@ -383,12 +482,12 @@ router.get('/status/:fileId', async (req: Request, res: Response) => {
       fileName: status.fileName,
       fileType: status.fileType,
       totalChunks: status.totalChunks,
-      receivedChunks: status.receivedChunks,
-      totalUploaded: status.receivedChunks.length,
-      progress: Math.round((status.receivedChunks.length / status.totalChunks) * 100),
+      receivedChunks: Array.from(status.receivedChunks),
+      totalUploaded: status.receivedChunks.size,
+      progress: Math.round((status.receivedChunks.size / status.totalChunks) * 100),
       isPaused: status.isPaused,
       isCompleted: status.isCompleted,
-      startTime: status.startTime
+      startTime: status.uploadStartTime
     });
   } catch (error) {
     handleError(res, error, 'Error al verificar el estado de la carga');
@@ -399,36 +498,28 @@ router.get('/status/:fileId', async (req: Request, res: Response) => {
  * Pausar una carga en progreso
  * PUT /api/upload/pause/:fileId
  */
-router.put('/pause/:fileId', async (req: Request, res: Response) => {
+router.put('/pause/:fileId', validateFileId, async (req: Request, res: Response) => {
+  const { fileId } = req.params;
+  const status = (req as any).uploadStatus as UploadStatus;
+
+  if (status.isCompleted) {
+    return res.status(400).json({ message: 'Upload already completed.' });
+  }
+  if (status.isPaused) {
+    return res.status(200).json({ message: 'Upload already paused.' });
+  }
+
+  status.isPaused = true;
+  status.lastActivityTime = Date.now();
+
   try {
-    const { fileId } = req.params;
-    
-    // Verificar estado actual
-    const status = await getUploadStatus(fileId);
-    
-    if (!status) {
-      return res.status(404).json({
-        error: 'ID de carga no encontrado'
-      });
-    }
-    
-    if (status.isCompleted) {
-      return res.status(400).json({
-        error: 'No se puede pausar una carga completada'
-      });
-    }
-    
-    // Actualizar estado
-    await saveUploadStatus(fileId, { isPaused: true });
-    
-    uploadLogger.info(`Carga pausada: ${fileId}`, { fileId });
-    
-    res.status(200).json({
-      message: 'Carga pausada correctamente',
-      fileId
-    });
+    // Pass only the changed fields
+    await saveUploadStatus(fileId, { isPaused: true, lastActivityTime: status.lastActivityTime });
+    logger.info(`Upload paused for fileId ${fileId}`);
+    res.status(200).json({ message: 'Upload paused successfully.' });
   } catch (error) {
-    handleError(res, error, 'Error al pausar la carga');
+    logger.error(`Error pausing upload for fileId ${fileId}: ${error}`);
+    res.status(500).json({ message: 'Failed to pause upload.' });
   }
 });
 
@@ -436,44 +527,32 @@ router.put('/pause/:fileId', async (req: Request, res: Response) => {
  * Reanudar una carga pausada
  * PUT /api/upload/resume/:fileId
  */
-router.put('/resume/:fileId', async (req: Request, res: Response) => {
+router.put('/resume/:fileId', validateFileId, async (req: Request, res: Response) => {
+  const { fileId } = req.params;
+  const status = (req as any).uploadStatus as UploadStatus;
+
+  if (status.isCompleted) {
+    return res.status(400).json({ message: 'Upload already completed.' });
+  }
+  if (!status.isPaused) {
+    return res.status(200).json({ message: 'Upload is not paused.' });
+  }
+
+  status.isPaused = false;
+  status.lastActivityTime = Date.now();
+
   try {
-    const { fileId } = req.params;
-    
-    // Verificar estado actual
-    const status = await getUploadStatus(fileId);
-    
-    if (!status) {
-      return res.status(404).json({
-        error: 'ID de carga no encontrado'
-      });
-    }
-    
-    if (status.isCompleted) {
-      return res.status(400).json({
-        error: 'No se puede reanudar una carga completada'
-      });
-    }
-    
-    if (!status.isPaused) {
-      return res.status(400).json({
-        error: 'La carga no está pausada'
-      });
-    }
-    
-    // Actualizar estado
-    await saveUploadStatus(fileId, { isPaused: false });
-    
-    uploadLogger.info(`Carga reanudada: ${fileId}`, { fileId });
-    
+    // Pass only the changed fields
+    await saveUploadStatus(fileId, { isPaused: false, lastActivityTime: status.lastActivityTime });
+    logger.info(`Upload resumed for fileId ${fileId}`);
     res.status(200).json({
-      message: 'Carga reanudada correctamente',
-      fileId,
-      receivedChunks: status.receivedChunks,
-      totalChunks: status.totalChunks
+      message: 'Upload resumed successfully.',
+      // Enviar los chunks ya recibidos para que el cliente sepa qué falta
+      receivedChunks: Array.from(status.receivedChunks).sort((a, b) => a - b)
     });
   } catch (error) {
-    handleError(res, error, 'Error al reanudar la carga');
+    logger.error(`Error resuming upload for fileId ${fileId}: ${error}`);
+    res.status(500).json({ message: 'Failed to resume upload.' });
   }
 });
 
@@ -481,54 +560,127 @@ router.put('/resume/:fileId', async (req: Request, res: Response) => {
  * Cancelar una carga
  * DELETE /api/upload/cancel/:fileId
  */
-router.delete('/cancel/:fileId', async (req: Request, res: Response) => {
+router.delete('/cancel/:fileId', validateFileId, async (req: Request, res: Response) => {
+  const { fileId } = req.params;
+  const status = (req as any).uploadStatus as UploadStatus;
+
+  logger.info(`Cancellation request received for fileId ${fileId}.`);
+
   try {
-    const { fileId } = req.params;
-    
-    // Verificar estado actual
-    const status = await getUploadStatus(fileId);
-    
-    if (!status) {
-      return res.status(404).json({
-        error: 'ID de carga no encontrado'
-      });
-    }
-    
-    if (status.isCompleted) {
-      return res.status(400).json({
-        error: 'No se puede cancelar una carga completada'
-      });
-    }
-    
-    // Eliminar chunks
-    if (status.receivedChunks && status.receivedChunks.length > 0) {
-      for (const chunkIndex of status.receivedChunks) {
-        const chunkPath = getChunkPath(fileId, chunkIndex);
-        if (fs.existsSync(chunkPath)) {
-          await fs.promises.unlink(chunkPath);
+    // Eliminar el estado y los chunks temporales asociados
+    await deleteUploadStatusAndChunks(fileId, status);
+
+    // Si el archivo ya se había ensamblado (p.ej., cancelación después de finalizar pero antes de respuesta), eliminarlo
+    if (status.filePath) { // Use filePath
+      try {
+        await fs.unlink(status.filePath); // Use filePath
+        logger.info(`Deleted final assembled file due to cancellation: ${status.filePath}`); // Use filePath
+      } catch (unlinkError: any) {
+        // No fallar si el archivo no existe o no se puede eliminar, pero loguearlo
+        if (unlinkError.code !== 'ENOENT') {
+          logger.error(`Could not delete final file ${status.filePath} during cancellation: ${unlinkError}`); // Use filePath
         }
       }
     }
-    
-    // Eliminar datos de Redis si existe
-    if (redisClient) {
-      await redisClient.del(`upload:${fileId}`);
-    } else {
-      memoryUploadStatus.delete(fileId);
-    }
-    
-    uploadLogger.info(`Carga cancelada: ${fileId}`, { 
-      fileId,
-      fileName: status.fileName
-    });
-    
-    res.status(200).json({
-      message: 'Carga cancelada correctamente',
-      fileId
-    });
+
+    logger.info(`Upload cancelled and cleaned up successfully for fileId ${fileId}.`);
+    res.status(200).json({ message: 'Upload cancelled and cleaned up successfully.' });
+
   } catch (error) {
-    handleError(res, error, 'Error al cancelar la carga');
+    logger.error(`Error cancelling upload for fileId ${fileId}: ${error}`);
+    res.status(500).json({ message: 'Failed to cancel upload and clean up resources.' });
   }
 });
+
+// Helper Functions (Removed duplicate local helpers)
+// async function saveUploadStatus(...) { ... } // Removed
+// async function getUploadStatus(...) { ... } // Removed
+// async function deleteUploadStatus(...) { ... } // Removed
+// async function saveChunk(...) { ... } // Removed (Using import)
+// async function cleanUpChunks(...) { ... } // Removed (Using import)
+
+// --- Fin Helpers ---
+
+// Configuración de Redis (si se usa) - Descomentado
+
+let redisRateLimiterClient: RedisClientType | null = null; // Use separate client for rate limiter potentially
+let rateLimiter: RateLimiterRedis | RateLimiterMemory | null = null;
+
+if (process.env.USE_REDIS === 'true') {
+    // Assuming redisClient (for status) is already initialized if redisEnabled
+    if (redisClient && redisClient.status === 'ready') { // Check status client readiness
+         rateLimiter = new RateLimiterRedis({
+             storeClient: redisClient, // Reuse status client or use a dedicated one
+             keyPrefix: 'rate_limit_upload',
+             points: parseInt(process.env.UPLOAD_RATE_LIMIT_POINTS || '10', 10), // Limit points from env
+             duration: parseInt(process.env.UPLOAD_RATE_LIMIT_DURATION || '60', 10), // Duration from env (seconds)
+         });
+         logger.info('Rate limiter initialized using Redis.');
+    } else if(redisClient) {
+        // Wait for status client to connect
+        redisClient.on('ready', () => {
+             if (!rateLimiter) { // Ensure it's not initialized twice
+                 rateLimiter = new RateLimiterRedis({
+                     storeClient: redisClient,
+                     keyPrefix: 'rate_limit_upload',
+                     points: parseInt(process.env.UPLOAD_RATE_LIMIT_POINTS || '10', 10),
+                     duration: parseInt(process.env.UPLOAD_RATE_LIMIT_DURATION || '60', 10),
+                 });
+                 logger.info('Rate limiter initialized after Redis connection ready.');
+             }
+         });
+         redisClient.on('error', (err) => {
+             logger.error('Redis client error prevented rate limiter initialization. Falling back to memory limiter.', err);
+             if (!rateLimiter) { // Fallback if Redis fails before rate limiter is setup
+                 rateLimiter = new RateLimiterMemory({
+                     keyPrefix: 'rate_limit_upload_mem',
+                     points: parseInt(process.env.UPLOAD_RATE_LIMIT_POINTS || '10', 10),
+                     duration: parseInt(process.env.UPLOAD_RATE_LIMIT_DURATION || '60', 10),
+                 });
+                  logger.warn('Rate limiter using in-memory store due to Redis error.');
+             }
+         });
+    } else {
+        // Fallback immediately if Redis client wasn't even attempted/created
+        logger.warn("Redis client for rate limiting not available. Using in-memory store.");
+        rateLimiter = new RateLimiterMemory({
+            keyPrefix: 'rate_limit_upload_mem',
+            points: parseInt(process.env.UPLOAD_RATE_LIMIT_POINTS || '10', 10),
+            duration: parseInt(process.env.UPLOAD_RATE_LIMIT_DURATION || '60', 10),
+        });
+    }
+} else {
+    logger.info("Redis is disabled. Using in-memory store for rate limiting.");
+     rateLimiter = new RateLimiterMemory({
+         keyPrefix: 'rate_limit_upload_mem',
+         points: parseInt(process.env.UPLOAD_RATE_LIMIT_POINTS || '10', 10), // Use env vars even for memory
+         duration: parseInt(process.env.UPLOAD_RATE_LIMIT_DURATION || '60', 10),
+     });
+}
+
+
+// Middleware de Rate Limiting (aplicado selectivamente)
+const rateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    if (!rateLimiter) {
+        logger.warn('Rate limiter not initialized, skipping middleware.');
+        return next(); // Should not happen if initialized correctly above, but safeguard
+    }
+    // Use IP as the key for rate limiting uploads, provide fallback
+    const key = req.ip || 'unknown_ip'; // Provide fallback for undefined req.ip
+    try {
+        await rateLimiter.consume(key); // Pass the guaranteed string key
+        next();
+    } catch (rejRes) {
+        logger.warn(`Rate limit exceeded for IP ${key}`);
+        res.status(429).json({ message: 'Too many requests, please try again later.' });
+    }
+};
+
+// Aplicar rate limiting a rutas de chunks y finalización
+router.use('/chunk/:fileId/:chunkIndex', rateLimitMiddleware);
+router.use('/finalize/:fileId', rateLimitMiddleware);
+router.use('/init', rateLimitMiddleware); // Also limit initialization requests
+
+// Removed duplicate TEMP_DIR/UPLOAD_DIR definitions
 
 export default router; 

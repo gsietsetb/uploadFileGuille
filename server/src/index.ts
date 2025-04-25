@@ -4,11 +4,11 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
-import winston from 'winston';
 import rateLimit from 'express-rate-limit';
 import { setupFolders } from './utils/fileUtils';
 import uploadRoutes from './routes/upload.routes';
 import monitoringRoutes from './routes/monitoring.routes';
+import { logger } from './utils/logger';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -16,22 +16,6 @@ dotenv.config();
 // Configuración del servidor
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-// Configuración del logger
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.printf(({ level, message, timestamp }) => {
-      return `${timestamp} ${level.toUpperCase()}: ${message}`;
-    })
-  ),
-  transports: [
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-    new winston.transports.Console({ format: winston.format.simple() })
-  ],
-});
 
 // Middleware CORS
 app.use(cors());

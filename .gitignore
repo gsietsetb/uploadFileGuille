@@ -22,3 +22,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /node_modules/
+/server/uploads/complete/2025-04-24/Route-1745505364059.jpg
+/server/uploads/complete/2025-04-25/c6bab83b-e469-4cef-9c52-7fb9938ca29c-1745581746042.jpg
+*.bak
+node_modules

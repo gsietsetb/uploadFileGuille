@@ -3,5 +3,9 @@
     "@types/node": "^22.14.1",
     "axios": "^1.8.4",
     "expo-document-picker": "^13.0.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/react": "~18.3.12"
   }
 }

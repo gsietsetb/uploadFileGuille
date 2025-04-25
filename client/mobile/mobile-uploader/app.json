@@ -17,14 +17,25 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourapp.mobileuploader"
+      "bundleIdentifier": "com.yourapp.mobileuploader",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Esta aplicación necesita acceso a la cámara para tomar fotos y subirlas al servidor.",
+        "NSPhotoLibraryUsageDescription": "Esta aplicación necesita acceso a la galería para seleccionar fotos y subirlas al servidor.",
+        "NSMicrophoneUsageDescription": "Esta aplicación necesita acceso al micrófono para grabar videos con audio."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yourapp.mobileuploader"
+      "package": "com.yourapp.mobileuploader",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,6 +45,12 @@
         "expo-document-picker",
         {
           "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "La aplicación necesita acceso a la cámara para tomar fotos y videos."
         }
       ]
     ],

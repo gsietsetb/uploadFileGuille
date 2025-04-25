@@ -108,3 +108,134 @@
 2025-04-24T15:04:24.395Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/6 200 - 5ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
 2025-04-24T15:04:24.439Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/7 200 - 10ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
 2025-04-24T15:04:24.476Z INFO: POST /chunk/27e31b71-c715-4a48-a015-a2bd636452e2/8 429 - 0ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:08:59.833Z INFO: POST /init 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T15:08:59.838Z INFO: POST /chunk/f0c53e25-2566-4689-a6ac-7be93b7935b4/0 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T15:08:59.848Z INFO: POST /finalize/f0c53e25-2566-4689-a6ac-7be93b7935b4 200 - 6ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-24T15:12:24.814Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T15:33:57.459Z INFO: POST /api/upload 404 - 2ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-24T15:42:24.831Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T16:12:24.783Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T16:42:24.812Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T17:12:24.798Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T17:42:24.788Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T18:12:24.764Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T18:42:24.794Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T19:12:24.785Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T19:42:24.799Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T20:12:24.787Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T20:42:24.794Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T21:12:24.752Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T21:42:24.750Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T21:59:59.885Z INFO: Limpieza de archivos antiguos completada
+2025-04-24T22:00:00.014Z INFO: Limpieza de archivos antiguos completada
+2025-04-24T22:12:24.761Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T22:42:24.720Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T23:12:24.689Z INFO: Limpieza de chunks antiguos completada
+2025-04-24T23:42:24.687Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T00:12:24.702Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T00:42:24.669Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T01:12:24.735Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T01:42:24.700Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T02:12:24.731Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T02:42:24.726Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T03:12:24.714Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T03:42:24.693Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T04:12:24.718Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T04:42:24.705Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T05:12:24.672Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T05:42:24.673Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T06:12:24.696Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T06:42:24.687Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T07:12:24.677Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T07:42:24.666Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T08:12:24.660Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T08:42:24.637Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T09:15:23.790Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T09:45:23.788Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T10:15:23.777Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T10:45:23.772Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T11:15:23.764Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T11:41:41.881Z INFO: POST /api/upload 404 - 3ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-25T11:45:23.749Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T11:48:32.882Z INFO: POST /api/upload 404 - 2ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0
+2025-04-25T11:48:57.066Z INFO: GET /complete/2025-04-24/Evolucio%CC%81n%20de%20Calcitonina%20en%20sangre%20%F0%9F%A7%AA-1745500357523.png 304 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:49:06.025Z INFO: POST /init 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:49:06.038Z INFO: POST /chunk/a4829d5d-2ad3-4110-b8f5-51626df02fd5/0 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:49:06.045Z INFO: POST /finalize/a4829d5d-2ad3-4110-b8f5-51626df02fd5 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:49:46.762Z INFO: POST /init 200 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:49:46.767Z INFO: POST /chunk/a03f1408-3ee3-48f2-9688-c0734f32ba04/0 200 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:49:46.771Z INFO: POST /finalize/a03f1408-3ee3-48f2-9688-c0734f32ba04 200 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:51:01.732Z INFO: GET /ws 404 - 2ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:51:03.041Z INFO: GET /ws 404 - 1ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:51:04.592Z INFO: GET / 200 - 2ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T11:51:04.736Z INFO: GET /favicon.ico 404 - 1ms - ::ffff:192.168.1.144 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+2025-04-25T12:17:21.340Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T12:50:27.452Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T13:24:11.956Z INFO: Limpieza de chunks antiguos completada
+2025-04-25T13:26:58.419Z INFO: Servidor corriendo en el puerto 3001
+2025-04-25T13:26:58.422Z INFO: Carpetas configuradas correctamente
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:05:04"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:05:04"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:05:04"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:06:20"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:06:20"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:06:20"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:08:59"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:08:59"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:08:59"}
+{"level":"info","message":"GET /uploads/complete/2025-04-25/1d6ee643-793e-49ef-90c9-bd0ac6279b36-Original-1745590217781.jpg 404 - 6ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 16:10:17"}
+{"level":"info","message":"GET /uploads/complete/2025-04-25/1d6ee643-793e-49ef-90c9-bd0ac6279b36-Original-1745590217781.jpg 404 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:10:38"}
+{"level":"info","message":"Upload initialized for c6bab83b-e469-4cef-9c52-7fb9938ca29c.jpg with fileId 7843cb8076b9bf1aadea1d1679663054","service":"user-service","timestamp":"2025-04-25 16:11:01"}
+{"level":"info","message":"POST /init 201 - 6ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:11:01"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:12:34"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:12:34"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:12:34"}
+{"level":"info","message":"Upload initialized for SampleApps_SwiftUI_PostProcessingDemo_QuickPose Demo_rain-dance.mov with fileId 01c10db10cc3881532007ae0c574fcc2","service":"user-service","timestamp":"2025-04-25 16:12:56"}
+{"level":"info","message":"POST /init 201 - 4ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:12:56"}
+{"level":"info","message":"Upload initialized for Comparativa de Salario Neto Mensual.png with fileId a87c96be2a7320996e48eab678eead21","service":"user-service","timestamp":"2025-04-25 16:12:56"}
+{"level":"info","message":"POST /init 201 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:12:56"}
+{"level":"info","message":"Upload initialized for Snapshot_202504112_070455.jpg with fileId 3022f24cfb324c7c82a8ab3278398e4e","service":"user-service","timestamp":"2025-04-25 16:12:56"}
+{"level":"info","message":"POST /init 201 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:12:56"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:13:00"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:13:00"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:13:00"}
+{"level":"warn","message":"File ID a87c96be2a7320996e48eab678eead21 not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:03"}
+{"level":"info","message":"POST /chunk/a87c96be2a7320996e48eab678eead21/0 404 - 9ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:03"}
+{"level":"warn","message":"File ID 01c10db10cc3881532007ae0c574fcc2 not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:03"}
+{"level":"info","message":"POST /chunk/01c10db10cc3881532007ae0c574fcc2/0 404 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:03"}
+{"level":"warn","message":"File ID 3022f24cfb324c7c82a8ab3278398e4e not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:03"}
+{"level":"info","message":"POST /chunk/3022f24cfb324c7c82a8ab3278398e4e/0 404 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:03"}
+{"level":"warn","message":"File ID a87c96be2a7320996e48eab678eead21 not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:05"}
+{"level":"info","message":"POST /chunk/a87c96be2a7320996e48eab678eead21/0 404 - 8ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:05"}
+{"level":"warn","message":"File ID 01c10db10cc3881532007ae0c574fcc2 not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:05"}
+{"level":"info","message":"POST /chunk/01c10db10cc3881532007ae0c574fcc2/0 404 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:05"}
+{"level":"warn","message":"File ID 3022f24cfb324c7c82a8ab3278398e4e not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:05"}
+{"level":"info","message":"POST /chunk/3022f24cfb324c7c82a8ab3278398e4e/0 404 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:05"}
+{"level":"warn","message":"File ID a87c96be2a7320996e48eab678eead21 not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:09"}
+{"level":"info","message":"POST /chunk/a87c96be2a7320996e48eab678eead21/0 404 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:09"}
+{"level":"warn","message":"File ID 01c10db10cc3881532007ae0c574fcc2 not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:09"}
+{"level":"info","message":"POST /chunk/01c10db10cc3881532007ae0c574fcc2/0 404 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:09"}
+{"level":"warn","message":"File ID 3022f24cfb324c7c82a8ab3278398e4e not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:09"}
+{"level":"info","message":"POST /chunk/3022f24cfb324c7c82a8ab3278398e4e/0 404 - 2ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:09"}
+{"level":"warn","message":"File ID a87c96be2a7320996e48eab678eead21 not found for validation.","service":"user-service","timestamp":"2025-04-25 16:13:17"}
+{"level":"info","message":"POST /chunk/a87c96be2a7320996e48eab678eead21/0 404 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:17"}
+{"level":"info","message":"POST /chunk/3022f24cfb324c7c82a8ab3278398e4e/0 429 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:17"}
+{"level":"info","message":"POST /chunk/01c10db10cc3881532007ae0c574fcc2/0 429 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:17"}
+{"level":"info","message":"POST /chunk/3022f24cfb324c7c82a8ab3278398e4e/0 429 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:18"}
+{"level":"info","message":"POST /chunk/01c10db10cc3881532007ae0c574fcc2/0 429 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:18"}
+{"level":"info","message":"POST /chunk/3022f24cfb324c7c82a8ab3278398e4e/0 429 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:20"}
+{"level":"info","message":"POST /chunk/01c10db10cc3881532007ae0c574fcc2/0 429 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:20"}
+{"level":"info","message":"POST /chunk/3022f24cfb324c7c82a8ab3278398e4e/0 429 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:24"}
+{"level":"info","message":"POST /chunk/01c10db10cc3881532007ae0c574fcc2/0 429 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:24"}
+{"level":"info","message":"POST /init 429 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:24"}
+{"level":"info","message":"POST /init 429 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:24"}
+{"level":"info","message":"POST /init 429 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 16:13:24"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:13:25"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:13:25"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:13:25"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:13:47"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:13:47"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:13:47"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:14:10"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:14:11"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:14:11"}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -12,7 +12,8 @@ import {
 import * as DocumentPicker from 'expo-document-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import {FileToUpload, uploadService} from "../services/uploadService";
-import {getFileExtension, normalizeFileName} from "../utils/fileUtils";
+import {getFileExtension, normalizeFileName, sanitizeUrl} from "../utils/fileUtils";
+import ConnectionStatus from './ConnectionStatus';
 
 // Tipo para el seguimiento del progreso de carga
 interface FileProgress {
@@ -24,10 +25,45 @@ interface FileProgress {
   url?: string;
 }
 
+// Modo de desarrollo - debe coincidir con la configuración en uploadService
+const DEVELOPMENT_MODE = true;
+
 const FileUploader: React.FC = () => {
   // Estado para los archivos y su progreso
   const [files, setFiles] = useState<FileProgress[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  
+  // Nuevo estado para el servidor
+  const [serverStatus, setServerStatus] = useState({
+    isConnected: false,
+    isChecking: true
+  });
+  
+  // Efecto para verificar la conexión con el servidor
+  useEffect(() => {
+    const checkServerConnection = async () => {
+      try {
+        setServerStatus({ isConnected: false, isChecking: true });
+        
+        // Intento simple de conexión
+        const testFileUrl = 'test-file.jpg';
+        const fullUrl = uploadService.getFileUrl(testFileUrl);
+        
+        // Si obtenemos una URL válida, asumimos que podemos conectarnos
+        if (fullUrl && fullUrl !== testFileUrl) {
+          setServerStatus({ isConnected: true, isChecking: false });
+        } else {
+          setServerStatus({ isConnected: false, isChecking: false });
+        }
+      } catch (error) {
+        console.error('Error al verificar la conexión:', error);
+        setServerStatus({ isConnected: false, isChecking: false });
+      }
+    };
+    
+    checkServerConnection();
+  }, []);
 
   // Seleccionar archivo
   const pickDocument = async () => {
@@ -196,23 +232,23 @@ const FileUploader: React.FC = () => {
     }
     
     // Icono basado en tipo de archivo
-    let iconName: keyof typeof MaterialIcons.glyphMap = 'insert-drive-file';
+    let iconName = 'insert-drive-file' as keyof typeof MaterialIcons.glyphMap;
     let iconColor = '#666';
     
     if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension)) {
-      iconName = 'image';
+      iconName = 'image' as keyof typeof MaterialIcons.glyphMap;
       iconColor = '#4CAF50';
     } else if (['mp4', 'mov', 'avi', 'webm'].includes(extension)) {
-      iconName = 'video-library';
+      iconName = 'video-library' as keyof typeof MaterialIcons.glyphMap;
       iconColor = '#2196F3';
     } else if (['doc', 'docx'].includes(extension)) {
-      iconName = 'description';
+      iconName = 'description' as keyof typeof MaterialIcons.glyphMap;
       iconColor = '#2196F3';
     } else if (['xls', 'xlsx'].includes(extension)) {
-      iconName = 'table-chart';
+      iconName = 'table-chart' as keyof typeof MaterialIcons.glyphMap;
       iconColor = '#4CAF50';
     } else if (['pdf'].includes(extension)) {
-      iconName = 'picture-as-pdf';
+      iconName = 'picture-as-pdf' as keyof typeof MaterialIcons.glyphMap;
       iconColor = '#F44336';
     }
     
@@ -227,13 +263,22 @@ const FileUploader: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Cargador de Archivos</Text>
       
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={pickDocument}
-        disabled={isUploading}
-      >
-        <Text style={styles.buttonText}>Seleccionar Archivo</Text>
-      </TouchableOpacity>
+      {/* Indicador de estado de conexión */}
+      <ConnectionStatus 
+        isConnected={serverStatus.isConnected} 
+        isDevelopment={DEVELOPMENT_MODE}
+      />
+      
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={pickDocument}
+          disabled={isUploading}
+        >
+          <MaterialIcons name="file-upload" size={24} color="white" style={styles.buttonIcon} />
+          <Text style={styles.buttonText}>Seleccionar Archivo</Text>
+        </TouchableOpacity>
+      </View>
       
       {/* Lista de archivos */}
       {files.length > 0 && (
@@ -260,7 +305,7 @@ const FileUploader: React.FC = () => {
                 style={styles.cancelButton} 
                 onPress={() => cancelUpload(file.id)}
               >
-                <Text style={styles.cancelText}>×</Text>
+                <MaterialIcons name="close" size={18} color="#ff3b30" />
               </TouchableOpacity>
             </View>
           ))}
@@ -293,12 +338,28 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#333',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 15,
+  },
   button: {
     backgroundColor: '#0066cc',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginVertical: 15,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  cameraButton: {
+    backgroundColor: '#4CAF50',
+    marginRight: 0,
+    marginLeft: 10,
+  },
+  buttonIcon: {
+    marginRight: 8,
   },
   buttonText: {
     color: 'white',
@@ -401,11 +462,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 10,
-  },
-  cancelText: {
-    fontSize: 18,
-    color: '#ff3b30',
-    fontWeight: 'bold',
   },
   loader: {
     marginTop: 20,
