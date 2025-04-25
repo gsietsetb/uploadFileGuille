@@ -344,7 +344,16 @@ router.post('/chunk/:fileId/:chunkIndex', validateFileId, upload.single('chunk')
     res.status(200).json({ message: `Chunk ${chunkIndex} recibido` });
 
   } catch (error) {
-    logger.error('Error al procesar chunk', { fileId, chunkIndex, error: (error as Error).message, stack: (error as Error).stack });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    logger.error('Error al procesar chunk', { 
+      fileId, 
+      chunkIndex, 
+      error: errorMessage,
+      stack: errorStack
+    });
+    
     res.status(500).json({ message: 'Error interno al procesar el chunk' });
   }
 });

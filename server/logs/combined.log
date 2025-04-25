@@ -239,3 +239,98 @@
 {"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:14:10"}
 {"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 16:14:11"}
 {"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 16:14:11"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:54:52"}
+{"level":"info","message":"Upload initialized for test.jpg with fileId d157fec4ee425d896f731172b4b12311","service":"user-service","timestamp":"2025-04-25 16:54:52"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:57:51"}
+{"level":"info","message":"Upload initialized for test.jpg with fileId 72c3ab0b7248a187d8f38cde4c0da9d0","service":"user-service","timestamp":"2025-04-25 16:57:51"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:59:02"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 16:59:02"}
+{"level":"info","message":"Upload initialized for test.jpg with fileId eb29aeeb0f25c38e4245812d437ed207","service":"user-service","timestamp":"2025-04-25 16:59:02"}
+{"level":"info","message":"Upload initialized for test.jpg with fileId e17f2ec4e63feb87bd4bfb04ba04b5ed","service":"user-service","timestamp":"2025-04-25 16:59:02"}
+{"level":"warn","message":"File ID test-file-id not found for validation.","service":"user-service","timestamp":"2025-04-25 16:59:02"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 17:01:15"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 17:01:15"}
+{"level":"info","message":"Upload initialized for test.jpg with fileId 239edf97b62dcc4d4d62f4f59a33797a","service":"user-service","timestamp":"2025-04-25 17:01:15"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 17:03:01"}
+{"level":"info","message":"Upload initialized for test.jpg with fileId ee56f53e0dd688ab714e59bd5276980f","service":"user-service","timestamp":"2025-04-25 17:03:01"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 17:03:01"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 17:36:12"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 17:36:12"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 17:36:12"}
+{"level":"info","message":"GET /health 200 - 3ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:36:19"}
+{"level":"info","message":"Upload initialized for 1d6ee643-793e-49ef-90c9-bd0ac6279b36_Original.jpg with fileId 8e9403f94594db157ca1e6aa41e2cc2d","service":"user-service","timestamp":"2025-04-25 17:36:35"}
+{"level":"info","message":"POST /init 201 - 10ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:36:35"}
+{"level":"info","message":"POST /api/upload/chunk/8e9403f94594db157ca1e6aa41e2cc2d 404 - 2ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:36:35"}
+{"level":"info","message":"Upload initialized for 1d6ee643-793e-49ef-90c9-bd0ac6279b36_Original.jpg with fileId dbfb79e20214c0d375332c6badef3914","service":"user-service","timestamp":"2025-04-25 17:36:38"}
+{"level":"info","message":"POST /init 201 - 4ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:36:38"}
+{"level":"info","message":"POST /api/upload/chunk/dbfb79e20214c0d375332c6badef3914 404 - 3ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:36:38"}
+{"level":"info","message":"Upload initialized for 1d6ee643-793e-49ef-90c9-bd0ac6279b36_Original.jpg with fileId e489782a480f6d1ca7351c3c56b4f0dd","service":"user-service","timestamp":"2025-04-25 17:36:40"}
+{"level":"info","message":"POST /init 201 - 3ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:36:40"}
+{"level":"info","message":"POST /api/upload/chunk/e489782a480f6d1ca7351c3c56b4f0dd 404 - 2ms - ::1 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:36:40"}
+{"level":"info","message":"GET /health 200 - 1ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 17:39:44"}
+{"level":"info","message":"GET /health 200 - 4ms - ::ffff:192.168.1.80 - Expo/1017655 CFNetwork/3826.500.121 Darwin/24.5.0","service":"user-service","timestamp":"2025-04-25 17:39:44"}
+{"level":"info","message":"Upload initialized for httpssis.redsys.essispagoTarjeta;jsessionid=0000uVeRGLX97168iOVw3bKlg0w1bc077vpd.pdf with fileId 577eb4258b974cb1519c97c3e43eb14c","service":"user-service","timestamp":"2025-04-25 17:41:48"}
+{"level":"info","message":"POST /init 201 - 5ms - ::ffff:192.168.1.80 - Expo/1017655 CFNetwork/3826.500.121 Darwin/24.5.0","service":"user-service","timestamp":"2025-04-25 17:41:48"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:22:37"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:22:37"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:22:37"}
+{"level":"info","message":"Upload initialized for Snapshot_202504112_070455.jpg with fileId 83b505f863bf954c105ae5b4f5781185","service":"user-service","timestamp":"2025-04-25 18:23:22"}
+{"level":"info","message":"POST /init 201 - 5ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:23:22"}
+{"level":"info","message":"Upload initialized for c6bab83b-e469-4cef-9c52-7fb9938ca29c.jpg with fileId 5bda570fd10aaf3d591be7b67d421052","service":"user-service","timestamp":"2025-04-25 18:23:22"}
+{"level":"info","message":"POST /init 201 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:23:22"}
+{"level":"info","message":"Upload initialized for Route.jpg with fileId f4fd28b4e91fd9fc04a730d73fbd1587","service":"user-service","timestamp":"2025-04-25 18:23:22"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:27:22"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:27:22"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:27:22"}
+{"level":"info","message":"Upload initialized for Snapshot_202504112_070455.jpg with fileId 7612dee7bd2310f8fe6fad6c98bb6704","service":"user-service","timestamp":"2025-04-25 18:28:41"}
+{"level":"info","message":"POST /init 201 - 8ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:28:41"}
+{"level":"info","message":"Upload initialized for c6bab83b-e469-4cef-9c52-7fb9938ca29c.jpg with fileId fa6a1353ff851b3589c45e88a1e24cbd","service":"user-service","timestamp":"2025-04-25 18:28:41"}
+{"level":"info","message":"POST /init 201 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:28:41"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:29:55"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:29:55"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:29:55"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:30:33"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:30:33"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:30:33"}
+{"level":"info","message":"GET /health 200 - 8ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 18:30:47"}
+{"level":"info","message":"Upload initialized for photo_1745598762483.jpg with fileId 53487598a5d223677971ccf097529014","service":"user-service","timestamp":"2025-04-25 18:32:43"}
+{"level":"info","message":"POST /init 201 - 8ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 18:32:43"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:34:14"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:34:14"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:34:14"}
+{"level":"warn","message":"File ID 53487598a5d223677971ccf097529014 not found for validation.","service":"user-service","timestamp":"2025-04-25 18:34:19"}
+{"level":"info","message":"DELETE /cancel/53487598a5d223677971ccf097529014 404 - 13ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 18:34:19"}
+{"level":"info","message":"GET /health 200 - 1ms - ::ffff:192.168.1.144 - Expo/2.32.18 CFNetwork/1568.300.101 Darwin/24.4.0","service":"user-service","timestamp":"2025-04-25 18:34:58"}
+{"level":"info","message":"Upload initialized for Snapshot_202504112_070455.jpg with fileId 9e160f46cfcb44a0dc1e7724ee7c7194","service":"user-service","timestamp":"2025-04-25 18:35:07"}
+{"level":"info","message":"POST /init 201 - 3ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:35:07"}
+{"level":"info","message":"Upload initialized for c6bab83b-e469-4cef-9c52-7fb9938ca29c.jpg with fileId 50850dc00f480e7fb50d3cd3d723e376","service":"user-service","timestamp":"2025-04-25 18:35:07"}
+{"level":"info","message":"POST /init 201 - 6ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:35:07"}
+{"level":"info","message":"Upload initialized for Route.jpg with fileId 4c557989069bd35a34a73f8ea368d931","service":"user-service","timestamp":"2025-04-25 18:35:07"}
+{"level":"info","message":"POST /init 201 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:35:07"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:36:52"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:36:52"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:36:52"}
+{"level":"info","message":"Upload initialized for Evolución de Calcitonina en sangre 🧪.png with fileId 40e373186a204835be59ed48f5819737","service":"user-service","timestamp":"2025-04-25 18:39:02"}
+{"level":"info","message":"POST /init 201 - 8ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:39:02"}
+{"level":"info","message":"Upload initialized for SampleApps_SwiftUI_PostProcessingDemo_QuickPose Demo_rain-dance.mov with fileId 5a134139866674f0a9bc214c1830ff5b","service":"user-service","timestamp":"2025-04-25 18:39:02"}
+{"level":"info","message":"POST /init 201 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:39:02"}
+{"level":"info","message":"Upload initialized for Comparativa de Salario Neto Mensual.png with fileId 86ca87ca5445018ca1dd8036ca686ff8","service":"user-service","timestamp":"2025-04-25 18:39:02"}
+{"level":"info","message":"POST /init 201 - 0ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:39:02"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:40:34"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:40:34"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:40:34"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:41:04"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:41:04"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:41:04"}
+{"level":"info","message":"Upload initialized for Evolución de Calcitonina en sangre 🧪.png with fileId 5e303e0c9ce9b5735cf1aaae2c880682","service":"user-service","timestamp":"2025-04-25 18:41:13"}
+{"level":"info","message":"POST /init 201 - 7ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:41:13"}
+{"level":"info","message":"Upload initialized for SampleApps_SwiftUI_PostProcessingDemo_QuickPose Demo_rain-dance.mov with fileId 9a2dc7e08a1a4ac400ba9beffac38884","service":"user-service","timestamp":"2025-04-25 18:41:13"}
+{"level":"info","message":"POST /init 201 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:41:13"}
+{"level":"info","message":"Upload initialized for Comparativa de Salario Neto Mensual.png with fileId 0f1986031d7d4db9d3806084e9af6f36","service":"user-service","timestamp":"2025-04-25 18:41:13"}
+{"level":"info","message":"POST /init 201 - 1ms - ::1 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36","service":"user-service","timestamp":"2025-04-25 18:41:13"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:41:27"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:41:27"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:41:27"}
+{"level":"info","message":"Redis is disabled. Using in-memory store for rate limiting.","service":"user-service","timestamp":"2025-04-25 18:44:24"}
+{"level":"info","message":"Servidor corriendo en el puerto 3001","service":"user-service","timestamp":"2025-04-25 18:44:24"}
+{"level":"info","message":"Carpetas configuradas correctamente","service":"user-service","timestamp":"2025-04-25 18:44:24"}

@@ -32,6 +32,30 @@ export const registerCompletedUpload = (success: boolean) => {
 };
 
 /**
+ * Verificar estado de salud del servidor
+ * GET /api/monitoring/health
+ */
+router.get('/health', (req: Request, res: Response) => {
+  const uptime = Date.now() - serverStartTime;
+  const memoryUsage = process.memoryUsage();
+  
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: {
+      ms: uptime,
+      formatted: formatUptime(uptime)
+    },
+    memory: {
+      rss: formatBytes(memoryUsage.rss),
+      heapTotal: formatBytes(memoryUsage.heapTotal),
+      heapUsed: formatBytes(memoryUsage.heapUsed),
+      external: formatBytes(memoryUsage.external)
+    }
+  });
+});
+
+/**
  * Obtener estadísticas generales
  * GET /api/monitoring/stats
  */

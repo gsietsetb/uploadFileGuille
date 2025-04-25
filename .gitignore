@@ -28,3 +28,7 @@ yarn-error.log*
 node_modules
 /server/uploads/complete/
 /server/node_modules/
+*.lock
+*.log
+*.tmp
+*.env
