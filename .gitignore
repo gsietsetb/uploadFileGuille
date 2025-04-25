@@ -27,8 +27,18 @@ yarn-error.log*
 *.bak
 node_modules
 /server/uploads/complete/
+/server/logs/
+/server/uploads/
 /server/node_modules/
 *.lock
 *.log
 *.tmp
 *.env
+
+# .gitignore
+node_modules/
+dist/
+build/
+.env
+uploads/
+logs/

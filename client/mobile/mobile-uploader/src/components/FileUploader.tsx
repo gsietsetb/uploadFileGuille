@@ -25,9 +25,6 @@ const DEFAULT_PORT = '3001';
 // Intentar usar la IP y puerto configurados o los valores predeterminados
 const API_URL = `http://${DEFAULT_IP}:${DEFAULT_PORT}/api/upload`;
 
-// Opción para cambiar la URL del servidor en tiempo de ejecución
-const [serverUrl, setServerUrl] = useState(API_URL);
-
 // Función de notificación que no bloquea la interfaz
 const showToast = (message: string) => {
   if (Platform.OS === 'android') {
@@ -62,6 +59,9 @@ const FileUploader: React.FC = () => {
     connected: false,
     isChecking: true
   });
+  
+  // Opción para cambiar la URL del servidor en tiempo de ejecución
+  const [serverUrl, setServerUrl] = useState(API_URL);
   
   // Estado para la cámara y previsualización
   const [cameraPermission, requestPermission] = useCameraPermissions();
