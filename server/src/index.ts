@@ -23,6 +23,9 @@ app.use(cors());
 // Middleware para parsear JSON
 app.use(express.json());
 
+// Confiar en la cabecera X-Forwarded-For si está presente (para req.ip)
+app.set('trust proxy', true);
+
 // Middleware de log de solicitudes
 app.use(morgan('combined'));
 

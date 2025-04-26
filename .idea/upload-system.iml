@@ -2,7 +2,13 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/client/mobile/mobile-uploader/.expo" />
+      <excludeFolder url="file://$MODULE_DIR$/server/logs" />
+      <excludeFolder url="file://$MODULE_DIR$/server/uploads" />
+      <excludeFolder url="file://$MODULE_DIR$/server/uploads/chunks" />
+      <excludeFolder url="file://$MODULE_DIR$/server/uploads/complete/2025-04-25" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

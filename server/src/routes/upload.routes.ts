@@ -348,8 +348,8 @@ router.post('/chunk/:fileId/:chunkIndex', validateFileId, upload.single('chunk')
     const errorStack = error instanceof Error ? error.stack : undefined;
     
     logger.error('Error al procesar chunk', { 
-      fileId, 
-      chunkIndex, 
+      fileId: fileId, 
+      chunkIndex: chunkIndex, 
       error: errorMessage,
       stack: errorStack
     });

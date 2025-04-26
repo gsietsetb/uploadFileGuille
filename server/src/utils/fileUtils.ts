@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { promisify } from 'util';
-import fileType from 'file-type';
+// Importar FileType (versión 16.5.4) para determinar el tipo de archivo por su contenido
+const FileType = require('file-type');
 
 const fsExists = promisify(fs.exists);
 const fsMkdir = promisify(fs.mkdir);
@@ -20,6 +21,18 @@ const FILE_RETENTION_DAYS = parseInt(process.env.FILE_RETENTION_DAYS || '30', 10
 
 // Cache para hashes de archivos para evitar duplicados
 const fileHashMap = new Map<string, string>();
+
+// Nueva función para sanitizar nombres de archivo
+const sanitizeFileName = (fileName: string): string => {
+  // Reemplazar espacios con guiones bajos
+  // Eliminar caracteres no alfanuméricos excepto ., -
+  // Convertir a minúsculas
+  return fileName
+    .toLowerCase()
+    .replace(/\s+/g, '_') // Reemplazar espacios con guiones bajos
+    .replace(/[^a-z0-9_.-]/g, '') // Eliminar caracteres no deseados
+    .replace(/_{2,}/g, '_'); // Reemplazar múltiples guiones bajos con uno solo
+};
 
 export interface FileResult {
   path: string;
@@ -78,7 +91,7 @@ export const validateFileType = async (
   declaredType: string
 ): Promise<boolean> => {
   try {
-    const fileTypeResult = await fileType.fromBuffer(buffer);
+    const fileTypeResult = await FileType.fromBuffer(buffer);
     
     // Si no se pudo detectar, podría ser un archivo de texto
     if (!fileTypeResult) {
@@ -133,9 +146,12 @@ export const assembleFile = async (
   
   // Generar nombre único para el archivo
   const fileExt = path.extname(fileName);
-  const baseName = path.basename(fileName, fileExt);
+  // Sanitizar el nombre base antes de usarlo
+  const baseName = sanitizeFileName(path.basename(fileName, fileExt)); 
   const timestamp = Date.now();
-  const uniqueFileName = `${baseName}-${timestamp}${fileExt}`;
+  // Asegurarse de que no haya puntos dobles antes de la extensión
+  const safeBaseName = baseName.replace(/\.$/, ''); 
+  const uniqueFileName = `${safeBaseName}-${timestamp}${fileExt}`;
   const filePath = path.join(datePath, uniqueFileName);
   
   // Crear stream de escritura

@@ -42,3 +42,4 @@ build/
 .env
 uploads/
 logs/
+/package-lock.json

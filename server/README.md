@@ -134,4 +134,126 @@ Para facilitar las pruebas, se han implementado varios mocks:
 - Configurar un entorno CI/CD para ejecutar pruebas automáticamente
 - Aumentar la cobertura de código con más pruebas unitarias
 - Implementar pruebas e2e con un cliente real
-- Mejorar las pruebas de flujo completo de carga utilizando un enfoque más realista con estado compartido 
+- Mejorar las pruebas de flujo completo de carga utilizando un enfoque más realista con estado compartido
+
+# Sistema de Carga de Archivos
+
+Este servidor implementa un sistema robusto de carga de archivos con soporte para subida por chunks, pausas, reinicios, y validación de tipos de archivo.
+
+## Características
+
+- Carga de archivos por chunks para mejor rendimiento y tolerancia a fallos
+- Soporte para pausar y reanudar cargas
+- Deduplicación automática de archivos mediante hashes MD5
+- Validación de tipos de archivo para seguridad
+- Monitoreo de estado del servidor y estadísticas
+- Limpieza automática de archivos temporales
+- API RESTful completa
+
+## Requisitos
+
+- Node.js 14+
+- TypeScript 4.6+
+- Redis (opcional, para almacenamiento de estado distribuido)
+
+## Instalación
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/user/upload-system.git
+cd upload-system/server
+
+# Instalar dependencias
+npm install
+
+# Compilar el proyecto
+npm run build
+```
+
+## Configuración
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```
+PORT=3001
+NODE_ENV=development
+REDIS_ENABLED=false
+REDIS_HOST=localhost
+REDIS_PORT=6379
+UPLOADS_DIR=uploads
+CHUNK_RETENTION_MINUTES=30
+FILE_RETENTION_DAYS=30
+MAX_FILE_SIZE=50000000
+ALLOWED_MIME_TYPES=image/jpeg,image/png,image/gif,video/mp4,application/pdf
+```
+
+## Ejecución
+
+```bash
+# Desarrollo
+npm run dev
+
+# Producción
+npm run build
+npm start
+```
+
+## Pruebas
+
+El sistema incluye una suite completa de pruebas:
+
+```bash
+# Ejecutar todas las pruebas (unitarias, integración y e2e)
+npm test
+
+# Ejecutar sólo pruebas unitarias
+npm run test:unit
+
+# Ejecutar sólo pruebas de integración
+npm run test:integration
+
+# Ejecutar sólo pruebas end-to-end
+npm run test:e2e
+```
+
+### Tipos de Tests Implementados
+
+#### Tests Unitarios
+- **fileUtils.test.ts**: Verifica la funcionalidad de utilidades de archivo como validación de tipo, cálculo de hash, y ensamblaje de chunks.
+- **uploadRetry.test.ts**: Prueba los mecanismos de reintento para operaciones de carga.
+
+#### Tests de Integración
+- **monitoring.test.ts**: Verifica que las API de monitoreo funcionen correctamente y proporcionen estadísticas precisas.
+
+#### Tests End-to-End (E2E)
+- **upload.test.ts**: Prueba todo el flujo de carga, desde la inicialización hasta el ensamblaje final.
+- **retry.test.ts**: Verifica el comportamiento del sistema frente a fallos de red, interrupciones y reintentos.
+
+## API Endpoints
+
+### Carga de Archivos
+
+- `POST /api/upload/init`: Inicializa una nueva carga
+- `POST /api/upload/chunk/:fileId/:chunkIndex`: Sube un chunk específico
+- `POST /api/upload/finalize/:fileId`: Finaliza la carga y ensambla el archivo
+- `GET /api/upload/status/:fileId`: Verifica el estado de una carga
+- `PUT /api/upload/pause/:fileId`: Pausa una carga
+- `PUT /api/upload/resume/:fileId`: Reanuda una carga pausada
+- `DELETE /api/upload/cancel/:fileId`: Cancela una carga y limpia sus recursos
+
+### Monitoreo
+
+- `GET /api/monitoring/health`: Verifica el estado de salud del servidor
+- `GET /api/monitoring/stats`: Obtiene estadísticas de uso
+- `GET /api/monitoring/storage`: Obtiene estadísticas de almacenamiento
+- `POST /api/monitoring/reset`: Reinicia contadores (sólo desde localhost)
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, sigue estos pasos:
+
+1. Crea un fork del repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/amazing-feature`)
+3. Haz commit de tus cambios (`git commit -m 'Add some amazing feature'`)
+4. Haz push a la rama (`git push origin feature/amazing-feature`)
+5. Abre un Pull Request 
