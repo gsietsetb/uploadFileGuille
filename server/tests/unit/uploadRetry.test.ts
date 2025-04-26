@@ -1,21 +1,32 @@
 import { expect, jest, describe, beforeEach, afterEach, it } from '@jest/globals';
 import crypto from 'crypto';
-const fs = require('fs-extra');
-const { retryChunkUpload, retryFileAssembly, retrySessionValidation } = require('../../src/utils/uploadRetry');
+import fs from 'fs-extra';
+import { retryChunkUpload, retryFileAssembly, retrySessionValidation } from '../../src/utils/uploadRetry';
 
-// Mock para fs-extra
+// Mock simplificado para fs-extra
 jest.mock('fs-extra', () => ({
-  // Usar mockResolvedValue<any>(...) para evitar error TS2345 si persiste
-  writeFile: jest.fn().mockResolvedValue(undefined),
-  readFile: jest.fn().mockResolvedValue(Buffer.from('test data')),
-  unlink: jest.fn().mockResolvedValue(undefined),
-  existsSync: jest.fn().mockReturnValue(true),
-  mkdirSync: jest.fn()
+  writeFile: jest.fn(),
+  readFile: jest.fn(),
+  unlink: jest.fn(),
+  existsSync: jest.fn(),
+  mkdirSync: jest.fn(),
 }));
+
+// Acceder a los mocks tipados
+const mockedFs = fs as jest.Mocked<typeof fs>;
 
 describe('Upload Retry Mechanism', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Resetear mocks antes de cada test
+    mockedFs.writeFile.mockResolvedValue(undefined);
+    mockedFs.readFile.mockResolvedValue(Buffer.from('test data'));
+    mockedFs.unlink.mockResolvedValue(undefined);
+    mockedFs.existsSync.mockReturnValue(true);
+    // mkdirSync es síncrona, no necesita mockResolvedValue
+    mockedFs.mkdirSync.mockImplementation(() => {});
+
     jest.spyOn(crypto, 'randomBytes').mockImplementation(() => Buffer.from('random-bytes'));
   });
 
@@ -28,6 +39,7 @@ describe('Upload Retry Mechanism', () => {
       const mockUpload = jest.fn()
         .mockRejectedValueOnce(new Error('Network Error'))
         .mockResolvedValueOnce({ success: true });
+      // Llama a la función real que usa los mocks
       const result = await retryChunkUpload(mockUpload, 'fileId', 1, Buffer.from('chunk data'));
       expect(mockUpload).toHaveBeenCalledTimes(2);
       expect(result).toEqual({ success: true });
@@ -36,13 +48,9 @@ describe('Upload Retry Mechanism', () => {
     it('should handle maximum retries exceeded', async () => {
       const mockUpload = jest.fn()
         .mockRejectedValue(new Error('Network Error'));
-      expect.assertions(2);
-      try {
-        await retryChunkUpload(mockUpload, 'fileId', 1, Buffer.from('chunk data'), 3);
-      } catch (error) {
-        expect(mockUpload).toHaveBeenCalledTimes(3);
-        expect((error as Error).message).toMatch(/maximum retries exceeded/i);
-      }
+      await expect(retryChunkUpload(mockUpload, 'fileId', 1, Buffer.from('chunk data'), 3))
+        .rejects.toThrow(/maximum retries exceeded/i);
+      expect(mockUpload).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -59,13 +67,9 @@ describe('Upload Retry Mechanism', () => {
     it('should validate file type during assembly', async () => {
       const mockAssembleFile = jest.fn()
         .mockRejectedValue(new Error('Tipo de archivo no válido'));
-      expect.assertions(2);
-      try {
-        await retryFileAssembly(mockAssembleFile, 'fileId', 1, 'malware.exe', 'application/exe');
-      } catch (error) {
-        expect(mockAssembleFile).toHaveBeenCalledTimes(1);
-        expect((error as Error).message).toMatch(/Tipo de archivo no válido/i);
-      }
+      await expect(retryFileAssembly(mockAssembleFile, 'fileId', 1, 'malware.exe', 'application/exe'))
+        .rejects.toThrow(/Tipo de archivo no válido/i);
+      expect(mockAssembleFile).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -76,8 +80,7 @@ describe('Upload Retry Mechanism', () => {
         .mockResolvedValueOnce({ valid: true, sessionId: 'session123' });
       const result = await retrySessionValidation(mockSessionCheck, 'oldSession');
       expect(mockSessionCheck).toHaveBeenCalledTimes(2);
-      expect(result).toHaveProperty('valid', true);
-      expect(result).toHaveProperty('sessionId', 'session123');
+      expect(result).toEqual({ valid: true, sessionId: 'session123' });
     });
   });
 }); 

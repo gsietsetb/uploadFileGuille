@@ -43,8 +43,14 @@ start_server() {
   echo -e "${BLUE}Iniciando servidor para tests E2E...${NC}"
   
   # Usar PORT diferente para evitar conflictos
-  export PORT=5000
-  export SERVER_URL="http://localhost:5000"
+  export E2E_PORT=5001
+  export PORT=$E2E_PORT
+  export SERVER_URL="http://localhost:$E2E_PORT"
+  
+  # Intentar detener cualquier proceso existente en el puerto E2E
+  echo -e "${BLUE}Asegurando que el puerto $E2E_PORT está libre...${NC}"
+  lsof -ti tcp:$E2E_PORT | xargs kill -9 2>/dev/null || true
+  sleep 1 # Dar tiempo a que el puerto se libere
   
   # Iniciar servidor en segundo plano
   NODE_ENV=test npm run start:dev > /tmp/server-test.log 2>&1 &
