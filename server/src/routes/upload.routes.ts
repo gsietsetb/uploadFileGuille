@@ -91,6 +91,15 @@ const upload = multer({
   },
 });
 
+// Configuración de Multer para chunks grandes
+const largeChunkStorage = multer.memoryStorage();
+const uploadLargeChunk = multer({
+  storage: largeChunkStorage,
+  limits: {
+    fileSize: parseInt(process.env.MAX_CHUNK_SIZE || '20000000', 10), // 20MB para chunks
+  },
+});
+
 // Interfaces para tipos
 interface ChunkRequest extends Request {
   file?: Express.Multer.File;
@@ -286,14 +295,22 @@ router.post('/init', async (req: Request, res: Response) => {
  * Subir un chunk
  * POST /api/upload/chunk/:fileId/:chunkIndex
  */
-router.post('/chunk/:fileId/:chunkIndex', validateFileId, upload.single('chunk'), async (req: Request, res: Response) => {
+router.post('/chunk/:fileId/:chunkIndex', validateFileId, (req, res, next) => {
+  // Determinar qué middleware de multer usar basado en la cabecera
+  const isLargeChunk = req.headers['x-large-chunk'] === 'true';
+  
+  if (isLargeChunk) {
+    uploadLargeChunk.single('chunk')(req, res, next);
+  } else {
+    upload.single('chunk')(req, res, next);
+  }
+}, async (req: Request, res: Response) => {
   const { fileId, chunkIndex: chunkIndexStr } = req.params;
   const chunkIndex = parseInt(chunkIndexStr, 10);
-  const logger = req.app.get('logger') as winston.Logger;
   const status = (req as any).uploadStatus as UploadStatus;
 
-  if (!req.file) {
-    logger.warn('Intento de subir chunk sin archivo', { fileId, chunkIndex });
+  if (!req.file && !req.body.chunkData) {
+    logger.warn('Intento de subir chunk sin archivo ni datos', { fileId, chunkIndex });
     return res.status(400).json({ message: 'Chunk no proporcionado' });
   }
 
@@ -313,24 +330,33 @@ router.post('/chunk/:fileId/:chunkIndex', validateFileId, upload.single('chunk')
       return res.status(409).json({ message: 'La carga está pausada' }); // 409 Conflict
     }
 
-    // Validar tipo de archivo en el primer chunk
-    if (chunkIndex === 0 && !status.validatedFileType) {
-      // Validation now happens within assembleFile using the first chunk buffer there.
-      // We store the declared type and rely on assembleFile's validation.
-      // const isValid = await validateFileType(req.file.buffer, status.fileType); // Remove direct validation here
-      // if (!isValid) { ... } 
-      // status.validatedFileType = status.fileType; // Validation occurs during final assembly
-       logger.info('First chunk received, type validation deferred to finalize step.', { fileId, declaredType: status.fileType });
-    }
-    
     // Verificar si el chunk ya fue recibido (importante para reintentos)
     if (status.receivedChunks.has(chunkIndex)) {
       logger.info('Chunk duplicado recibido', { fileId, chunkIndex });
       return res.status(200).json({ message: 'Chunk ya recibido' });
     }
 
+    // Determinar la fuente de datos y guardar el chunk
+    let chunkBuffer: Buffer;
+    
+    if (req.file) {
+      // Si es un archivo binario
+      chunkBuffer = req.file.buffer;
+    } else if (req.body.chunkData) {
+      // Si son datos codificados en base64
+      try {
+        chunkBuffer = Buffer.from(req.body.chunkData, 'base64');
+      } catch (error) {
+        logger.error('Error al decodificar datos base64', { fileId, chunkIndex, error });
+        return res.status(400).json({ message: 'Datos de chunk inválidos' });
+      }
+    } else {
+      logger.warn('Formato de chunk desconocido', { fileId, chunkIndex });
+      return res.status(400).json({ message: 'Formato de chunk no reconocido' });
+    }
+
     // Guardar el chunk
-    await saveChunk(fileId, chunkIndex, req.file.buffer);
+    await saveChunk(fileId, chunkIndex, chunkBuffer);
     logger.debug('Chunk guardado', { fileId, chunkIndex });
 
     // Actualizar estado
@@ -378,8 +404,11 @@ router.post('/chunk/:fileId/:chunkIndex', validateFileId, upload.single('chunk')
       stack: errorStack
     });
     
-    // Enviar un mensaje genérico al cliente, el detalle está en los logs del servidor
-    res.status(500).json({ message: 'Error interno al procesar el chunk' });
+    // Enviar un mensaje más específico al cliente
+    res.status(500).json({ 
+      message: 'Error interno al procesar el chunk',
+      details: errorMessage.includes('Field value too long') ? 'Field value too long' : 'Error en el servidor'
+    });
   }
 });
 
@@ -411,7 +440,6 @@ const deleteUploadStatusAndChunks = async (fileId: string, status: UploadStatus 
  */
 router.post('/finalize/:fileId', validateFileId, async (req: Request, res: Response) => {
   const { fileId } = req.params;
-  const logger = req.app.get('logger') as winston.Logger;
   const status = (req as any).uploadStatus as UploadStatus;
   const { md5: clientMd5 } = req.body; // Opcional: MD5 enviado por el cliente para verificación
 
@@ -421,7 +449,7 @@ router.post('/finalize/:fileId', validateFileId, async (req: Request, res: Respo
     if (status.filePath) { // Use filePath
       try {
         await fs.access(status.filePath); // Use filePath
-        const fileUrl = `${req.protocol}://${req.get('host')}/uploads/complete/${path.basename(status.filePath)}`; // Adjust URL based on assembleFile structure
+        const fileUrl = `http://localhost:3001/uploads/complete/${path.basename(path.dirname(status.filePath))}/${path.basename(status.filePath)}`; 
         return res.status(200).json({ message: 'Upload already completed.', fileUrl, md5Hash: status.md5Hash });
       } catch (accessError) {
         logger.warn(`Final file path ${status.filePath} for completed upload ${fileId} not accessible. Re-assembling.`); // Use filePath
@@ -482,7 +510,8 @@ router.post('/finalize/:fileId', validateFileId, async (req: Request, res: Respo
     // Limpiar chunks temporales después de ensamblar (Handled by assembleFile internally now)
     // await cleanupOldChunks(fileId, status.totalChunks); // Removed duplicate cleanup call
 
-    const fileUrl = assemblyResult.url; // Use URL from result
+    // Modificar la URL para que siempre use el puerto 3001
+    const fileUrl = `http://localhost:3001${assemblyResult.url}`;
     logger.info(`Upload finalized successfully for fileId ${fileId}. URL: ${fileUrl}`);
     res.status(200).json({ message: 'File uploaded and assembled successfully.', fileUrl, md5Hash: serverMd5 });
 

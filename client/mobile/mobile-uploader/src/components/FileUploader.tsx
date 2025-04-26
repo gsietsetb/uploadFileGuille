@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, ScrollView, SafeAreaView, StatusBar, ToastAndroid, Platform, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, ScrollView, SafeAreaView, StatusBar, ToastAndroid, Platform, FlatList, LogBox } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { FontAwesome } from '@expo/vector-icons';
 import * as Crypto from 'expo-crypto';
+import { generateUUID } from '../utils/fileUtils';
 
 // Tamaño del chunk (1MB)
 const CHUNK_SIZE = 1 * 1024 * 1024;
@@ -51,6 +52,11 @@ interface FileInfo {
   selectedForUpload?: boolean;
 }
 
+// Función para generar un ID único sin usar crypto.randomUUID()
+const generateId = (): string => {
+  return generateUUID();
+};
+
 const FileUploader: React.FC = () => {
   // Estado de archivos y carga
   const [files, setFiles] = useState<FileInfo[]>([]);
@@ -75,9 +81,16 @@ const FileUploader: React.FC = () => {
   // Estado para control de concurrencia
   const [activeUploads, setActiveUploads] = useState<number>(0);
 
-  // Mostrar notificación no intrusiva
+  // Mostrar notificación no intrusiva en un toast más elegante
   const showNotification = (message: string) => {
     setNotification(message);
+    
+    // Usar solo el console.log para debug, no para notificaciones al usuario
+    if (__DEV__) {
+      console.log(message);
+    }
+    
+    // Mostrar toast
     showToast(message);
     
     // Limpiar la notificación después de 3 segundos
@@ -86,18 +99,15 @@ const FileUploader: React.FC = () => {
     }, 3000);
   };
 
-  // Verificar conexión del servidor
+  // Verificar conexión del servidor - sin console.log
   useEffect(() => {
     const checkServerConnection = async () => {
       try {
-        console.log('Verificando conexión con el servidor...');
         // Intentamos conectar con el endpoint de health
         await axios.get(`${serverUrl.split('/api')[0]}/api/monitoring/health`);
-        console.log('Conexión exitosa');
         setServerStatus({ connected: true, isChecking: false });
         showNotification('Servidor conectado');
       } catch (error) {
-        console.error('Error de conexión:', error);
         setServerStatus({ connected: false, isChecking: false });
         
         // Notificación en lugar de alerta modal
@@ -160,6 +170,7 @@ const FileUploader: React.FC = () => {
         
         // Guardar información del archivo
         newValidFiles.push({
+          id: generateId(),
           name: fileAsset.name,
           size: fileAsset.size,
           type: fileAsset.mimeType || 'application/octet-stream',
@@ -213,13 +224,13 @@ const FileUploader: React.FC = () => {
       <TouchableOpacity 
         style={styles.fileSelectButton}
         onPress={() => toggleFileSelection(item.id!)}
-        disabled={item.status === 'uploading'}
+        disabled={item.status === 'uploading' || item.status === 'completed'}
       >
         <FontAwesome 
           name={item.selectedForUpload ? "check-square-o" : "square-o"} 
           size={24} 
           color={
-            item.status === 'uploading' ? "#ccc" :
+            item.status === 'uploading' || item.status === 'completed' ? "#ccc" :
             item.selectedForUpload ? "#4CAF50" : "#666"
           } 
         />
@@ -358,7 +369,7 @@ const FileUploader: React.FC = () => {
       return;
     }
     
-    // Obtener archivos seleccionados para carga
+    // Obtener archivos seleccionados para carga (solo los pendientes, con error o pausados)
     const selectedFiles = files.filter(file => 
       file.selectedForUpload && 
       (file.status === 'pending' || file.status === 'failed' || file.status === 'paused')
@@ -373,6 +384,7 @@ const FileUploader: React.FC = () => {
     
     // Crear un queue de carga
     const uploadQueue = [...selectedFiles];
+    let hasErrors = false;
     
     // Iniciar cargas concurrentes (hasta MAX_CONCURRENT_UPLOADS)
     const runUploadQueue = async () => {
@@ -397,13 +409,18 @@ const FileUploader: React.FC = () => {
               } else if (newCount === 0 && uploadQueue.length === 0) {
                 // Si todas las cargas están completas, actualizar el estado
                 setIsUploading(false);
-                showNotification('Todas las cargas completadas');
+                if (!hasErrors) {
+                  showNotification('Todas las cargas completadas');
+                } else {
+                  showNotification('Carga completada con algunos errores');
+                }
               }
               return newCount;
             });
           })
           .catch(error => {
             console.error('Error en carga individual:', error);
+            hasErrors = true;
             setActiveUploads(current => {
               const newCount = current - 1;
               
@@ -412,6 +429,7 @@ const FileUploader: React.FC = () => {
                 setTimeout(runUploadQueue, 100);
               } else if (newCount === 0 && uploadQueue.length === 0) {
                 setIsUploading(false);
+                showNotification('Carga completada con errores');
               }
               return newCount;
             });
@@ -419,14 +437,31 @@ const FileUploader: React.FC = () => {
       }
     };
     
-    // Iniciar el procesamiento de la cola
-    runUploadQueue();
+    // Iniciar el procesamiento de la cola con un tiempo de espera de seguridad
+    try {
+      runUploadQueue();
+      
+      // Agregar un timeout de seguridad para evitar que se quede bloqueado en caso de error
+      setTimeout(() => {
+        if (activeUploads > 0) {
+          console.warn("Tiempo de espera excedido para las cargas. Restableciendo estado...");
+          setActiveUploads(0);
+          setIsUploading(false);
+          showNotification('Tiempo de espera excedido. Algunas cargas pueden haber fallado.');
+        }
+      }, 120000); // 2 minutos como límite máximo
+    } catch (error) {
+      console.error("Error general en el proceso de carga:", error);
+      setIsUploading(false);
+      setActiveUploads(0);
+      showNotification('Error al iniciar el proceso de carga');
+    }
   };
 
   // Cargar un solo archivo con sistema de reintentos
   const uploadSingleFile = async (file: FileInfo): Promise<void> => {
     // Asegurarnos de que el archivo tiene un ID único
-    const fileId = file.id || crypto.randomUUID();
+    const fileId = file.id || generateId();
     
     // Actualizar estado inicial
     updateFileProgress(fileId, { 
@@ -438,10 +473,7 @@ const FileUploader: React.FC = () => {
     });
     
     try {
-      console.log('Iniciando carga de archivo:', file.name);
-      
       // 1. Iniciar el proceso de carga en el servidor
-      console.log('Inicializando carga en el servidor...');
       const initResponse = await axiosWithRetry(() => axios.post(`${serverUrl}/init`, {
         fileName: file.name,
         fileSize: file.size,
@@ -449,7 +481,6 @@ const FileUploader: React.FC = () => {
         totalChunks: Math.ceil(file.size / CHUNK_SIZE)
       }));
       
-      console.log('Respuesta de inicialización:', initResponse.data);
       const serverFileId = initResponse.data.fileId;
       
       if (!serverFileId) {
@@ -464,7 +495,6 @@ const FileUploader: React.FC = () => {
       
       // 2. Cargar chunks
       const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-      console.log(`Subiendo archivo en ${totalChunks} fragmentos...`);
       
       // Obtener chunks ya subidos (para reanudación)
       const uploadedChunks = file.uploadedChunks || [];
@@ -475,7 +505,6 @@ const FileUploader: React.FC = () => {
       for (let i = 0; i < totalChunks; i++) {
         // Omitir chunks ya subidos
         if (uploadedChunks.includes(i)) {
-          console.log(`Chunk ${i} ya subido, omitiendo`);
           continue;
         }
         
@@ -485,9 +514,6 @@ const FileUploader: React.FC = () => {
         // Crear y almacenar la promesa de carga de chunk
         const chunkPromise = (async (chunkIndex) => {
           try {
-            // Mostrar progreso en consola para debugging
-            console.log(`Subiendo fragmento ${chunkIndex+1}/${totalChunks} (${start}-${end} de ${file.size})`);
-            
             // Leer el chunk como base64
             const chunk = await FileSystem.readAsStringAsync(file.uri, {
               encoding: FileSystem.EncodingType.Base64,
@@ -495,23 +521,47 @@ const FileUploader: React.FC = () => {
               length: end - start
             });
             
-            // Crear FormData para enviar el chunk
-            const formData = new FormData();
-            formData.append('chunk', {
-              uri: file.uri,
-              name: file.name,
-              type: file.type
-            } as any);
-            formData.append('chunkIndex', String(chunkIndex));
-            formData.append('totalChunks', String(totalChunks));
-            formData.append('chunkData', chunk);
-            
-            // Enviar el chunk con reintentos
-            await axiosWithRetry(() => axios.post(`${serverUrl}/chunk/${serverFileId}/${chunkIndex}`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            }));
+            // Dividir el chunk en partes más pequeñas si es demasiado grande
+            const MAX_CHUNK_SIZE = 500000; // Tamaño máximo en caracteres para la petición
+            if (chunk.length > MAX_CHUNK_SIZE) {
+              console.log(`Subiendo fragmento ${chunkIndex}/${totalChunks} (${start}-${end} de ${file.size})`);
+              
+              // Usar formData con Blob en lugar de datos base64 directos
+              const formData = new FormData();
+              formData.append('fileId', serverFileId);
+              formData.append('chunkIndex', String(chunkIndex));
+              formData.append('totalChunks', String(totalChunks));
+              
+              // Crear un blob desde los datos del archivo para este chunk
+              const fileChunk = {
+                uri: file.uri,
+                type: file.type,
+                name: `${file.name}.part${chunkIndex}`,
+              };
+              
+              formData.append('chunk', fileChunk as any);
+              
+              // Enviar el chunk con reintentos
+              await axiosWithRetry(() => axios.post(`${serverUrl}/chunk/${serverFileId}/${chunkIndex}`, formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'X-Large-Chunk': 'true'
+                }
+              }));
+            } else {
+              // Para chunks pequeños, usar el enfoque original
+              const formData = new FormData();
+              formData.append('fileId', serverFileId);
+              formData.append('chunkIndex', String(chunkIndex));
+              formData.append('totalChunks', String(totalChunks));
+              formData.append('chunkData', chunk);
+              
+              await axiosWithRetry(() => axios.post(`${serverUrl}/chunk/${serverFileId}/${chunkIndex}`, formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              }));
+            }
             
             // Actualizar chunks subidos
             updateFileProgress(serverFileId, { 
@@ -523,7 +573,6 @@ const FileUploader: React.FC = () => {
             if (currentFile) {
               const currentChunks = [...(currentFile.uploadedChunks || []), chunkIndex];
               const progress = Math.round((currentChunks.length / totalChunks) * 100);
-              console.log(`Progreso: ${progress}%`);
               updateFileProgress(serverFileId, { progress });
             }
             
@@ -541,7 +590,6 @@ const FileUploader: React.FC = () => {
       await Promise.all(chunkPromises);
       
       // 3. Finalizar la carga
-      console.log('Finalizando carga del archivo...');
       await axiosWithRetry(() => axios.post(`${serverUrl}/finalize/${serverFileId}`));
       
       // Actualizar estado final
@@ -550,17 +598,13 @@ const FileUploader: React.FC = () => {
         progress: 100
       });
       
-      console.log('Carga completada con éxito');
       showNotification(`"${file.name}" subido correctamente`);
       return;
     } catch (error: any) {
-      console.error('Error al subir archivo:', error);
-      
       // Mensaje de error más descriptivo
       let errorMessage = 'No se pudo completar la carga.';
       
       if (error.response) {
-        console.error('Respuesta del servidor:', error.response.data);
         errorMessage += ` Error ${error.response.status}`;
       } else if (error.request) {
         errorMessage += ' No se recibió respuesta del servidor.';
@@ -591,9 +635,26 @@ const FileUploader: React.FC = () => {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         return await fn();
-      } catch (error) {
-        console.log(`Intento ${attempt + 1}/${maxRetries} fallido, reintentando en ${delay}ms...`);
+      } catch (error: any) {
         lastError = error;
+        
+        // Comprobar si el error es HTTP 500 con mensaje específico de "Field value too long"
+        if (error.response && 
+            error.response.status === 500 && 
+            error.response.data && 
+            error.response.data.message && 
+            error.response.data.message.includes("Field value too long")) {
+          console.error("Error de valor demasiado largo, no se reintentará:", error.response.data);
+          throw error; // No reintentar este tipo de error
+        }
+        
+        // Log del intento fallido
+        console.log(`Intento ${attempt + 1}/${maxRetries} fallido, reintentando en ${delay}ms...`);
+        
+        // Mostrar notificación solo en el primer intento
+        if (attempt === 0) {
+          showNotification(`Reintentando... (${attempt + 1}/${maxRetries})`);
+        }
         
         // Esperar antes de reintentar (retroceso exponencial)
         await new Promise(resolve => setTimeout(resolve, delay));
@@ -601,7 +662,7 @@ const FileUploader: React.FC = () => {
       }
     }
     
-    console.error(`Todos los reintentos fallaron después de ${maxRetries} intentos`);
+    console.error(`Todos los reintentos fallaron después de ${maxRetries} intentos`, lastError);
     throw lastError;
   };
 
@@ -681,7 +742,7 @@ const FileUploader: React.FC = () => {
       
       // Crear nuevo objeto FileInfo
       const newFile: FileInfo = {
-        id: Crypto.randomUUID(),
+        id: generateId(),
         name: photoName,
         size: fileSize,
         type: 'image/jpeg',
@@ -760,171 +821,194 @@ const FileUploader: React.FC = () => {
 
   // Vista principal
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.contentContainer}
+      keyboardShouldPersistTaps="handled"
+    >
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f7" />
-      <Text style={styles.title}>Subir Archivos</Text>
       
-      {/* Mostrador de notificaciones */}
-      {notification && (
-        <View style={styles.notificationContainer}>
-          <Text style={styles.notificationText}>{notification}</Text>
-        </View>
-      )}
-      
-      {/* Indicador de estado del servidor */}
-      <View style={styles.statusContainer}>
-        <View style={[
-          styles.statusIndicator, 
-          serverStatus.isChecking 
-            ? styles.statusChecking 
-            : serverStatus.connected 
-              ? styles.statusConnected 
-              : styles.statusDisconnected
-        ]} />
-        <Text style={styles.statusText}>
-          {serverStatus.isChecking 
-            ? 'Verificando conexión...' 
-            : serverStatus.connected 
-              ? 'Servidor conectado' 
-              : 'Servidor desconectado'}
-        </Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Subir Archivos</Text>
       </View>
       
-      {/* Contador de archivos */}
-      <Text style={styles.fileCounter}>
-        {files.length} / {MAX_FILES} archivos seleccionados
-      </Text>
-      
-      {/* Botones de acción principal */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity 
-          style={[
-            styles.button, 
-            styles.pickButton,
-            (isUploading || files.length >= MAX_FILES) && styles.buttonDisabled
-          ]} 
-          onPress={pickFile}
-          disabled={isUploading || files.length >= MAX_FILES}
-        >
-          <FontAwesome name="file" size={20} color="white" />
-          <Text style={styles.buttonText}>Seleccionar</Text>
-        </TouchableOpacity>
+      <View style={styles.uploadContainer}>
+        {/* Mostrador de notificaciones */}
+        {notification && (
+          <View style={styles.notificationContainer}>
+            <Text style={styles.notificationText}>{notification}</Text>
+          </View>
+        )}
         
-        <TouchableOpacity 
-          style={[
-            styles.button, 
-            styles.cameraButton,
-            (isUploading || !cameraPermission?.granted || files.length >= MAX_FILES) && styles.buttonDisabled
-          ]} 
-          onPress={() => setShowCamera(true)}
-          disabled={isUploading || !cameraPermission?.granted || files.length >= MAX_FILES}
-        >
-          <FontAwesome name="camera" size={20} color="white" />
-          <Text style={styles.buttonText}>Cámara</Text>
-        </TouchableOpacity>
-      </View>
-      
-      {/* Lista de archivos */}
-      {files.length > 0 && (
-        <View style={styles.fileListContainer}>
-          <Text style={styles.sectionTitle}>Archivos seleccionados:</Text>
-          <View style={styles.fileListWrapper}>
+        {/* Indicador de estado del servidor */}
+        <View style={styles.statusContainer}>
+          <View style={[
+            styles.statusIndicator, 
+            serverStatus.isChecking 
+              ? styles.statusChecking 
+              : serverStatus.connected 
+                ? styles.statusConnected 
+                : styles.statusDisconnected
+          ]} />
+          <Text style={styles.statusText}>
+            {serverStatus.isChecking 
+              ? 'Verificando conexión...' 
+              : serverStatus.connected 
+                ? 'Servidor conectado' 
+                : 'Servidor desconectado'}
+          </Text>
+        </View>
+        
+        {/* Contador de archivos */}
+        <Text style={styles.fileCounter}>
+          {files.length} / {MAX_FILES} archivos seleccionados
+        </Text>
+        
+        {/* Botones de acción principal */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={[
+              styles.button, 
+              styles.pickButton,
+              (isUploading || files.length >= MAX_FILES) && styles.buttonDisabled
+            ]} 
+            onPress={pickFile}
+            disabled={isUploading || files.length >= MAX_FILES}
+          >
+            <FontAwesome name="file" size={20} color="white" />
+            <Text style={styles.buttonText}>Seleccionar</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[
+              styles.button, 
+              styles.cameraButton,
+              (isUploading || !cameraPermission?.granted || files.length >= MAX_FILES) && styles.buttonDisabled
+            ]} 
+            onPress={() => setShowCamera(true)}
+            disabled={isUploading || !cameraPermission?.granted || files.length >= MAX_FILES}
+          >
+            <FontAwesome name="camera" size={20} color="white" />
+            <Text style={styles.buttonText}>Cámara</Text>
+          </TouchableOpacity>
+        </View>
+        
+        {/* Lista de archivos */}
+        {files.length > 0 && (
+          <View style={styles.fileListContainer}>
+            <Text style={styles.sectionTitle}>Archivos seleccionados:</Text>
             <FlatList
               data={files}
               renderItem={renderFileItem}
               keyExtractor={(item, index) => item.id || `file-${index}`}
               style={styles.fileList}
+              scrollEnabled={true}
               nestedScrollEnabled={true}
             />
           </View>
-        </View>
-      )}
-      
-      {/* Previsualización del archivo */}
-      {previewUri && (
-        <View style={styles.previewContainer}>
-          <Text style={styles.sectionTitle}>Previsualización:</Text>
-          <View style={styles.previewGrid}>
-            {files.filter(file => file.type.startsWith('image/')).slice(0, 4).map((file, index) => (
-              <TouchableOpacity
-                key={file.id || index}
-                onPress={() => setPreviewUri(file.uri)}
-                style={[
-                  styles.previewGridItem,
-                  previewUri === file.uri && styles.previewGridItemSelected
-                ]}
-              >
-                <Image
-                  source={{ uri: file.uri }}
-                  style={styles.previewGridImage}
-                  resizeMode="cover"
-                />
-                {file.status === 'uploading' && (
-                  <View style={styles.previewItemOverlay}>
-                    <ActivityIndicator size="small" color="white" />
-                    <Text style={styles.previewItemProgress}>{file.progress.toFixed(0)}%</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
+        )}
+        
+        {/* Previsualización del archivo */}
+        {previewUri && (
+          <View style={styles.previewContainer}>
+            <Text style={styles.sectionTitle}>Previsualización:</Text>
+            <ScrollView 
+              horizontal 
+              style={styles.previewGrid}
+              contentContainerStyle={styles.previewGridContainer}
+            >
+              {files.filter(file => file.type.startsWith('image/')).slice(0, 4).map((file, index) => (
+                <TouchableOpacity
+                  key={file.id || index}
+                  onPress={() => setPreviewUri(file.uri)}
+                  style={[
+                    styles.previewGridItem,
+                    previewUri === file.uri && styles.previewGridItemSelected
+                  ]}
+                >
+                  <Image
+                    source={{ uri: file.uri }}
+                    style={styles.previewGridImage}
+                    resizeMode="cover"
+                  />
+                  {file.status === 'uploading' && (
+                    <View style={styles.previewItemOverlay}>
+                      <ActivityIndicator size="small" color="white" />
+                      <Text style={styles.previewItemProgress}>{file.progress.toFixed(0)}%</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <Image 
+              source={{ uri: previewUri }} 
+              style={styles.previewImage}
+              resizeMode="contain"
+            />
           </View>
-          <Image 
-            source={{ uri: previewUri }} 
-            style={styles.previewImage}
-            resizeMode="contain"
-          />
-        </View>
-      )}
-      
-      {/* Botones de acción secundaria */}
-      {files.length > 0 && (
-        <View style={styles.actionContainer}>
-          {!isUploading ? (
-            <>
-              <TouchableOpacity 
-                style={[
-                  styles.button, 
-                  styles.uploadButton,
-                  (!serverStatus.connected || files.filter(f => f.selectedForUpload).length === 0) && styles.buttonDisabled
-                ]} 
-                onPress={() => {
-                  // Efecto visual al presionar
-                  console.log('Botón de subir presionado');
-                  showNotification('Iniciando carga...');
-                  
-                  // Llamar a la función de subir archivo
-                  uploadFile();
-                }}
-                disabled={!serverStatus.connected || files.filter(f => f.selectedForUpload).length === 0}
-              >
-                <FontAwesome name="upload" size={20} color="white" />
-                <Text style={styles.buttonText}>Subir seleccionados</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.button, styles.resetButton]} 
-                onPress={() => {
-                  setFiles([]);
-                  setPreviewUri(null);
-                  showNotification('Se han limpiado todos los archivos');
-                }}
-              >
-                <FontAwesome name="trash" size={20} color="white" />
-                <Text style={styles.buttonText}>Eliminar todos</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#4CAF50" />
-              <Text style={styles.loadingText}>Subiendo archivos...</Text>
-            </View>
-          )}
-        </View>
-      )}
+        )}
+        
+        {/* Botones de acción secundaria */}
+        {files.length > 0 && (
+          <View style={styles.actionContainer}>
+            {!isUploading ? (
+              <>
+                <TouchableOpacity 
+                  style={[
+                    styles.button, 
+                    styles.uploadButton,
+                    (!serverStatus.connected || 
+                      files.filter(f => f.selectedForUpload && f.status !== 'completed').length === 0) && 
+                    styles.buttonDisabled
+                  ]} 
+                  onPress={() => {
+                    showNotification('Iniciando carga...');
+                    uploadFile();
+                  }}
+                  disabled={!serverStatus.connected || files.filter(f => f.selectedForUpload && f.status !== 'completed').length === 0}
+                >
+                  <FontAwesome name="upload" size={20} color="white" />
+                  <Text style={styles.buttonText}>
+                    {files.filter(f => f.selectedForUpload && f.status !== 'completed').length > 0 
+                      ? 'Subir seleccionados' 
+                      : 'No hay archivos para subir'}
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.button, styles.resetButton]} 
+                  onPress={() => {
+                    setFiles([]);
+                    setPreviewUri(null);
+                    showNotification('Se han limpiado todos los archivos');
+                  }}
+                >
+                  <FontAwesome name="trash" size={20} color="white" />
+                  <Text style={styles.buttonText}>Eliminar todos</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#4CAF50" />
+                <Text style={styles.loadingText}>Subiendo archivos...</Text>
+              </View>
+            )}
+          </View>
+        )}
+      </View>
     </ScrollView>
   );
 };
 
+// Ocultar el mensaje de error en desarrollo
+LogBox.ignoreLogs([
+  'VirtualizedLists should never be nested',
+  'ScrollView child layout',
+  'Require cycle:', // También ocultar advertencias de ciclos de dependencia
+  'Warning: Invariant Violation: ScrollView child layout'
+]);
+
+// Actualizar estilos para adaptarse a la nueva estructura
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -932,6 +1016,19 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
+    paddingBottom: 40,
+  },
+  header: {
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  uploadContainer: {
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 24,
@@ -1159,16 +1256,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   notificationContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 8,
-    padding: 10,
+    backgroundColor: 'rgba(33, 33, 33, 0.85)',
+    borderRadius: 24,
+    padding: 12,
     marginBottom: 20,
     alignSelf: 'center',
+    minWidth: 150,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   notificationText: {
     color: 'white',
     textAlign: 'center',
     fontSize: 14,
+    fontWeight: '500',
   },
   fileCounter: {
     textAlign: 'center',
@@ -1178,6 +1282,8 @@ const styles = StyleSheet.create({
   },
   fileListContainer: {
     marginVertical: 16,
+    flex: 0,
+    height: 240, // Altura fija para la lista de archivos
   },
   sectionTitle: {
     fontSize: 18,
@@ -1186,7 +1292,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   fileList: {
-    maxHeight: 200,
+    flex: 1,
+    height: 210,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
   },
   fileListItem: {
     flexDirection: 'row',
@@ -1301,11 +1410,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
+  previewGridContainer: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    padding: 5,
+  },
   previewGridItem: {
-    width: '23%',
-    aspectRatio: 1,
+    width: 80,
+    height: 80,
     borderRadius: 8,
-    marginVertical: 5,
+    marginHorizontal: 5,
     overflow: 'hidden',
     borderWidth: 2,
     borderColor: 'transparent',
