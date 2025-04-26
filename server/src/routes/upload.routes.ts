@@ -344,16 +344,41 @@ router.post('/chunk/:fileId/:chunkIndex', validateFileId, upload.single('chunk')
     res.status(200).json({ message: `Chunk ${chunkIndex} recibido` });
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    
+    // Manejo de errores más robusto
+    let errorMessage = 'Error desconocido al procesar el chunk';
+    let errorStack: string | undefined = undefined;
+
+    if (error instanceof Error) {
+      // Si es una instancia de Error, usamos su mensaje y stack
+      errorMessage = error.message;
+      errorStack = error.stack;
+    } else if (typeof error === 'string') {
+      // Si es un string, lo usamos como mensaje
+      errorMessage = error;
+    } else if (error && typeof error === 'object' && 'message' in error) {
+      // Si es un objeto con propiedad 'message', la usamos
+      errorMessage = String(error.message);
+      // Intentar obtener el stack si existe
+      if ('stack' in error) {
+        errorStack = String(error.stack);
+      }
+    } else {
+      // Si no, intentar convertir el error a string
+      try {
+        errorMessage = JSON.stringify(error);
+      } catch (stringifyError) {
+        errorMessage = 'Error al procesar el chunk (no se pudo serializar el error original)';
+      }
+    }
+
     logger.error('Error al procesar chunk', { 
       fileId: fileId, 
       chunkIndex: chunkIndex, 
-      error: errorMessage,
+      originalError: errorMessage, // Usar un nombre diferente para la clave
       stack: errorStack
     });
     
+    // Enviar un mensaje genérico al cliente, el detalle está en los logs del servidor
     res.status(500).json({ message: 'Error interno al procesar el chunk' });
   }
 });

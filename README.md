@@ -30,7 +30,7 @@ Un sistema completo para la carga de archivos de gran tamaño con soporte para m
 - ✅ Carga concurrente de múltiples archivos
 - ⏳ Drag-and-drop (en desarrollo)
 - ⏳ Almacenamiento local para historial de cargas (en desarrollo)
-
+![img_1.png](img_1.png)
 ### Cliente Móvil (React Native + Expo)
 - ✅ Carga de archivos desde galería
 - ✅ Captura de fotos con cámara integrada
@@ -40,6 +40,8 @@ Un sistema completo para la carga de archivos de gran tamaño con soporte para m
 - ✅ Gestión de conexión al servidor
 - ✅ Carga concurrente de múltiples archivos
 - ⏳ Carga en segundo plano (en desarrollo)
+
+![img.png](img.png)
 
 ### Testing
 - ✅ Tests unitarios para componentes críticos
